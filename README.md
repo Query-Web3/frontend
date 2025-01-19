@@ -129,7 +129,7 @@ queryweb3-frontend/
 
 ## 联系方式
 
-项目地址：[https://github.com/yourusername/queryweb3-frontend](https://github.com/yourusername/queryweb3-frontend)
+项目地址：[https://github.com/Query-Web3/frontend](https://github.com/Query-Web3/frontend)
 
 ## 致谢
 
