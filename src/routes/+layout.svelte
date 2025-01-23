@@ -1,12 +1,22 @@
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
-  import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
-  import '../app.css';
+  import {
+    Navbar,
+    NavBrand,
+    NavLi,
+    NavUl,
+    NavHamburger,
+  } from "flowbite-svelte";
+  import "../app.css";
+
+  const { children } = $props();
 </script>
 
 <Navbar let:hidden let:toggle>
   <NavBrand href="/">
-    <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+    <span
+      class="self-center whitespace-nowrap text-xl font-semibold dark:text-white"
+    >
       QueryWeb3
     </span>
   </NavBrand>
@@ -19,5 +29,5 @@
 </Navbar>
 
 <main class="container mx-auto px-4 py-8">
-  <slot />
+  {@render children()}
 </main>
