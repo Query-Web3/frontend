@@ -10,12 +10,14 @@
     TableHeadCell,
     Label,
     Card,
+    Pagination,
   } from "flowbite-svelte";
   import { getYield } from "$lib/api";
   import type { YieldQuery } from "$lib/api";
   import { format } from "date-fns";
   import { select_option } from "$lib/utils";
   import { onMount } from "svelte";
+  import { IconFileTypePdf, IconFileTypeXls } from "@tabler/icons-svelte";
 
   let loading = $state(false);
   let selectedDate = $state(format(new Date(), "yyyy-MM-dd"));
@@ -61,10 +63,18 @@
       loading = false;
     }
   }
+
+  function exportToPDF() {
+    // Implementation for PDF export
+  }
+
+  function exportToExcel() {
+    // Implementation for Excel export
+  }
 </script>
 
 <div class="max-w-7xl mx-auto">
-  <Card class="mb-6" size="none">
+  <Card class="mb-3" size="none">
     <h2 class="text-2xl font-bold mb-4">Yield Query</h2>
 
     <form
@@ -118,7 +128,7 @@
   </Card>
 
   {#if data.length > 0}
-    <Card size="none">
+    <Card class="mb-3" size="none">
       <Table striped={true}>
         <TableHead>
           <TableHeadCell>Token</TableHeadCell>
@@ -153,5 +163,29 @@
         </TableBody>
       </Table>
     </Card>
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex gap-2">
+        <Button color="light" on:click={exportToPDF}>
+          <IconFileTypePdf class="w-5 h-5 mr-2" />
+          Export PDF
+        </Button>
+        <Button color="light" on:click={exportToExcel}>
+          <IconFileTypeXls class="w-5 h-5 mr-2" />
+          Export Excel
+        </Button>
+      </div>
+      <div class="flex items-center gap-4">
+        <Pagination
+          totalPages={1000}
+          pages={[
+            { name: "1", href: "?page=1", active: true },
+            { name: "2", href: "?page=2" },
+            { name: "2", href: "?page=3" },
+            { name: "4", href: "?page=4" },
+            { name: "5", href: "?page=5" },
+          ]}
+        />
+      </div>
+    </div>
   {/if}
 </div>

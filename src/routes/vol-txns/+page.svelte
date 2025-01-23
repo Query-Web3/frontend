@@ -10,14 +10,15 @@
     TableHead,
     TableHeadCell,
     Label,
+    Pagination,
     type SelectOptionType,
   } from "flowbite-svelte";
   import { getVolTxns } from "$lib/api";
   import type { VolTxnsQuery } from "$lib/api";
   import { format } from "date-fns";
   import { onMount } from "svelte";
-  import Chart from "chart.js/auto";
   import { select_option } from "$lib/utils";
+  import { IconFileTypePdf, IconFileTypeXls } from "@tabler/icons-svelte";
 
   let loading = $state(false);
   let fromDate = $state(format(new Date(), "yyyy-MM-dd"));
@@ -25,81 +26,19 @@
   let selectedChain = $state("Ethereum");
   let selectedCycle = $state("daily");
   let chartCanvas: HTMLCanvasElement | undefined = $state();
-  let chart: Chart | null = $state(null);
   let data: any[] = $state([]);
   let chartInitialized = $state(false);
 
   const chains = select_option(["Ethereum", "BSC", "Polygon"]);
   const cycles = select_option(["daily", "weekly", "monthly", "yearly"]);
 
-  $effect(() => {
-    if (!chartCanvas || data.length === 0) return;
-
-    // Debounce chart updates
-    const timeoutId = setTimeout(() => {
-      updateChart();
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  });
+  // Pagination state
+  let currentPage = $state(1);
+  let itemsPerPage = $state(10);
 
   onMount(() => {
     handleSubmit();
   });
-
-  async function updateChart() {
-    if (!chartCanvas) return;
-    
-    const ctx = chartCanvas.getContext("2d");
-    if (!ctx) return;
-
-    const chartData = {
-      labels: data.map((item) => format(new Date(item.time), "yyyy-MM-dd")),
-      datasets: [
-        {
-          label: "Volume",
-          data: data.map((item) => item.volume),
-          borderColor: "rgb(75, 192, 192)",
-          tension: 0.1,
-        },
-        {
-          label: "Transactions",
-          data: data.map((item) => item.txns),
-          borderColor: "rgb(255, 99, 132)",
-          tension: 0.1,
-        },
-      ],
-    };
-
-    if (chart) {
-      // Update existing chart instead of destroying
-      chart.data = chartData;
-      chart.update('none'); // Use 'none' mode for better performance
-    } else {
-      chart = new Chart(ctx, {
-        type: "line",
-        data: chartData,
-        options: {
-          responsive: true,
-          animation: {
-            duration: 0 // Disable animations for better performance
-          },
-          interaction: {
-            mode: "index",
-            intersect: false,
-          },
-          scales: {
-            y: {
-              type: "linear",
-              display: true,
-              position: "left",
-            },
-          },
-        },
-      });
-      chartInitialized = true;
-    }
-  }
 
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
@@ -128,19 +67,18 @@
     }
   }
 
-  // Clean up chart on component destroy
-  onMount(() => {
-    return () => {
-      if (chart) {
-        chart.destroy();
-        chart = null;
-      }
-    };
-  });
+  // Export functions
+  async function exportToPDF() {
+    // Implementation for PDF export
+  }
+
+  async function exportToExcel() {
+    // Implementation for Excel export
+  }
 </script>
 
 <div class="max-w-7xl mx-auto">
-  <Card class="mb-6" size="none">
+  <Card class="mb-3" size="none">
     <h2 class="text-2xl font-bold mb-4">Volume & Transactions Query</h2>
 
     <form
@@ -186,19 +124,16 @@
   </Card>
 
   {#if data.length > 0}
-    <Card class="mb-6" size="none">
-      <canvas bind:this={chartCanvas}></canvas>
-    </Card>
-
-    <Card size="none">
+    <Card class="mb-3" size="none">
       <Table striped={true}>
         <TableHead>
-          <TableHeadCell>Time</TableHeadCell>
-          <TableHeadCell>Volume</TableHeadCell>
-          <TableHeadCell>YoY</TableHeadCell>
-          <TableHeadCell>QoQ</TableHeadCell>
-          <TableHeadCell>Txns</TableHeadCell>
-          <TableHeadCell>Txns YoY</TableHeadCell>
+          <TableHeadCell>time</TableHeadCell>
+          <TableHeadCell>vol($)</TableHeadCell>
+          <TableHeadCell>yoy</TableHeadCell>
+          <TableHeadCell>qoq</TableHeadCell>
+          <TableHeadCell>txns</TableHeadCell>
+          <TableHeadCell>yoy</TableHeadCell>
+          <TableHeadCell>qoq</TableHeadCell>
         </TableHead>
         <TableBody>
           {#each data as item}
@@ -219,10 +154,46 @@
                   ? `${item.txns_yoy.toFixed(2)}%`
                   : "-"}</TableBodyCell
               >
+              <TableBodyCell>{item.txns.toLocaleString()}</TableBodyCell>
             </TableBodyRow>
           {/each}
         </TableBody>
       </Table>
     </Card>
+
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex gap-2">
+        <Button color="light" on:click={exportToPDF}>
+          <IconFileTypePdf class="w-5 h-5 mr-2" />
+          Export PDF
+        </Button>
+        <Button color="light" on:click={exportToExcel}>
+          <IconFileTypeXls class="w-5 h-5 mr-2" />
+          Export Excel
+        </Button>
+      </div>
+      <div class="flex items-center gap-4">
+        <Select
+          class="w-24"
+          items={[
+            { value: "10", name: "10" },
+            { value: "25", name: "25" },
+            { value: "50", name: "50" },
+            { value: "100", name: "100" },
+          ]}
+          bind:value={itemsPerPage}
+        />
+        <Pagination
+          totalPages={1000}
+          pages={[
+            { name: "1", href: "?page=1", active: true },
+            { name: "2", href: "?page=2" },
+            { name: "2", href: "?page=3" },
+            { name: "4", href: "?page=4" },
+            { name: "5", href: "?page=5" },
+          ]}
+        />
+      </div>
+    </div>
   {/if}
 </div>
