@@ -19,71 +19,91 @@
   import Chart from "chart.js/auto";
   import { select_option } from "$lib/utils";
 
-  let loading = false;
-  let fromDate = format(new Date(), "yyyy-MM-dd");
-  let toDate = format(new Date(), "yyyy-MM-dd");
-  let selectedChain = "Ethereum";
-  let selectedCycle = "daily";
-  let chartCanvas: HTMLCanvasElement;
-  let chart: Chart | null = null;
-
-  let data: any[] = [];
+  let loading = $state(false);
+  let fromDate = $state(format(new Date(), "yyyy-MM-dd"));
+  let toDate = $state(format(new Date(), "yyyy-MM-dd"));
+  let selectedChain = $state("Ethereum");
+  let selectedCycle = $state("daily");
+  let chartCanvas: HTMLCanvasElement | undefined = $state();
+  let chart: Chart | null = $state(null);
+  let data: any[] = $state([]);
+  let chartInitialized = $state(false);
 
   const chains = select_option(["Ethereum", "BSC", "Polygon"]);
-
   const cycles = select_option(["daily", "weekly", "monthly", "yearly"]);
 
-  function updateChart() {
-    if (!chartCanvas || !data.length) return;
+  $effect(() => {
+    if (!chartCanvas || data.length === 0) return;
 
-    if (chart) {
-      chart.destroy();
-    }
+    // Debounce chart updates
+    const timeoutId = setTimeout(() => {
+      updateChart();
+    }, 100);
 
+    return () => clearTimeout(timeoutId);
+  });
+
+  onMount(() => {
+    handleSubmit();
+  });
+
+  async function updateChart() {
+    if (!chartCanvas) return;
+    
     const ctx = chartCanvas.getContext("2d");
     if (!ctx) return;
 
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: data.map((item) => format(new Date(item.time), "yyyy-MM-dd")),
-        datasets: [
-          {
-            label: "Volume",
-            data: data.map((item) => item.volume),
-            borderColor: "rgb(75, 192, 192)",
-            tension: 0.1,
-          },
-          {
-            label: "Transactions",
-            data: data.map((item) => item.txns),
-            borderColor: "rgb(255, 99, 132)",
-            tension: 0.1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        interaction: {
-          mode: "index",
-          intersect: false,
+    const chartData = {
+      labels: data.map((item) => format(new Date(item.time), "yyyy-MM-dd")),
+      datasets: [
+        {
+          label: "Volume",
+          data: data.map((item) => item.volume),
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
         },
-        scales: {
-          y: {
-            type: "linear",
-            display: true,
-            position: "left",
+        {
+          label: "Transactions",
+          data: data.map((item) => item.txns),
+          borderColor: "rgb(255, 99, 132)",
+          tension: 0.1,
+        },
+      ],
+    };
+
+    if (chart) {
+      // Update existing chart instead of destroying
+      chart.data = chartData;
+      chart.update('none'); // Use 'none' mode for better performance
+    } else {
+      chart = new Chart(ctx, {
+        type: "line",
+        data: chartData,
+        options: {
+          responsive: true,
+          animation: {
+            duration: 0 // Disable animations for better performance
+          },
+          interaction: {
+            mode: "index",
+            intersect: false,
+          },
+          scales: {
+            y: {
+              type: "linear",
+              display: true,
+              position: "left",
+            },
           },
         },
-      },
-    });
+      });
+      chartInitialized = true;
+    }
   }
 
-  $: if (data.length) {
-    updateChart();
-  }
+  async function handleSubmit(e?: Event) {
+    e?.preventDefault();
 
-  async function handleSubmit() {
     if (!fromDate || !toDate) {
       alert("Please select dates");
       return;
@@ -101,28 +121,30 @@
       const response = await getVolTxns(query);
       data = response.data;
     } catch (error) {
-      console.error(error);
-      alert("Failed to fetch data");
+      // console.error(error);
+      // alert("Failed to fetch data");
     } finally {
       loading = false;
     }
   }
 
+  // Clean up chart on component destroy
   onMount(() => {
     return () => {
       if (chart) {
         chart.destroy();
+        chart = null;
       }
     };
   });
 </script>
 
 <div class="max-w-7xl mx-auto">
-  <Card class="mb-6">
+  <Card class="mb-6" size="none">
     <h2 class="text-2xl font-bold mb-4">Volume & Transactions Query</h2>
 
     <form
-      on:submit|preventDefault={handleSubmit}
+      onsubmit={handleSubmit}
       class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"
     >
       <div>
@@ -155,7 +177,7 @@
         <Select id="cycle" bind:value={selectedCycle} items={cycles} />
       </div>
 
-      <div class="md:col-span-4">
+      <div class="md:col-span-4 flex items-center justify-center">
         <Button type="submit" disabled={loading}>
           {loading ? "Loading..." : "Query"}
         </Button>
@@ -168,7 +190,7 @@
       <canvas bind:this={chartCanvas}></canvas>
     </Card>
 
-    <Card>
+    <Card size="none">
       <Table striped={true}>
         <TableHead>
           <TableHeadCell>Time</TableHeadCell>

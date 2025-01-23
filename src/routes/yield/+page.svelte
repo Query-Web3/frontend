@@ -9,12 +9,13 @@
     TableHead,
     TableHeadCell,
     Label,
+    Card,
   } from "flowbite-svelte";
   import { getYield } from "$lib/api";
   import type { YieldQuery } from "$lib/api";
   import { format } from "date-fns";
-  import Card from "$lib/comp/flowbite/Card.svelte";
   import { select_option } from "$lib/utils";
+  import { onMount } from "svelte";
 
   let loading = $state(false);
   let selectedDate = $state(format(new Date(), "yyyy-MM-dd"));
@@ -30,8 +31,12 @@
   const returnTypes = select_option(["", "Staking", "Farming", "Lending"]);
   const tokens = select_option(["", "ETH", "USDT", "USDC", "DAI"]);
 
-  async function handleSubmit(e: Event) {
-    e.preventDefault();
+  onMount(() => {
+    handleSubmit();
+  });
+
+  async function handleSubmit(e?: Event) {
+    e?.preventDefault();
     if (!selectedDate) {
       alert("Please select a date");
       return;
@@ -104,7 +109,7 @@
         <Select id="token" bind:value={selectedToken} items={tokens} />
       </div>
 
-      <div class="md:col-span-3 lg:col-span-5">
+      <div class="md:col-span-5 flex items-center justify-center">
         <Button type="submit" disabled={loading}>
           {loading ? "Loading..." : "Query"}
         </Button>
@@ -113,7 +118,7 @@
   </Card>
 
   {#if data.length > 0}
-    <Card>
+    <Card size="none">
       <Table striped={true}>
         <TableHead>
           <TableHeadCell>Token</TableHeadCell>

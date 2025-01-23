@@ -28,7 +28,9 @@
 		"chart.js": "^4.4.0",
 		"date-fns": "^2.30.0",
 		"flowbite": "^2.2.0",
-		"flowbite-svelte": "^0.44.19"
+		"flowbite-svelte": "^0.44.19",
+		"http-api": "https://github.com/iyangdianfeng/http-api.git",
+		"zod": "3.24.1"
 	},
 	"overrides": {
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6"

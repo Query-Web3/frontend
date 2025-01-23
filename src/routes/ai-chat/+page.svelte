@@ -45,10 +45,8 @@
         let newY = item.y + item.speed.y;
 
         // Bounce off edges
-        if (newX <= 0 || newX >= 100)
-          item.speed.x = (Math.random() - 0.5) * 0.01;
-        if (newY <= 0 || newY >= 100)
-          item.speed.y = (Math.random() - 0.5) * 0.01;
+        if (newX <= 0 || newX >= 100) item.speed.x *= -1;
+        if (newY <= 0 || newY >= 100) item.speed.y *= -1;
 
         return {
           ...item,
