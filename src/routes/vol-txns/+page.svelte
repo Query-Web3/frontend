@@ -25,9 +25,7 @@
   let toDate = $state(format(new Date(), "yyyy-MM-dd"));
   let selectedChain = $state("Ethereum");
   let selectedCycle = $state("daily");
-  let chartCanvas: HTMLCanvasElement | undefined = $state();
   let data: any[] = $state([]);
-  let chartInitialized = $state(false);
 
   const chains = select_option(["Ethereum", "BSC", "Polygon"]);
   const cycles = select_option(["daily", "weekly", "monthly", "yearly"]);
@@ -182,16 +180,6 @@
             { value: "100", name: "100" },
           ]}
           bind:value={itemsPerPage}
-        />
-        <Pagination
-          totalPages={1000}
-          pages={[
-            { name: "1", href: "?page=1", active: true },
-            { name: "2", href: "?page=2" },
-            { name: "2", href: "?page=3" },
-            { name: "4", href: "?page=4" },
-            { name: "5", href: "?page=5" },
-          ]}
         />
       </div>
     </div>
