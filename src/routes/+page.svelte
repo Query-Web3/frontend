@@ -4,7 +4,7 @@
   const texts = [
     "Composable Finance",
     "Continuum",
-    "Robonomics",
+    "Polkadot",
     "Interlay",
     "Polkimex",
     "SORA",

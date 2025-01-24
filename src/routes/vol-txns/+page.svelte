@@ -23,11 +23,11 @@
   let loading = $state(false);
   let fromDate = $state(format(new Date(), "yyyy-MM-dd"));
   let toDate = $state(format(new Date(), "yyyy-MM-dd"));
-  let selectedChain = $state("Ethereum");
+  let selectedChain = $state("Polkadot");
   let selectedCycle = $state("daily");
   let data: any[] = $state([]);
 
-  const chains = select_option(["Ethereum", "BSC", "Polygon"]);
+  const chains = select_option(["Polkadot", "Kusama", "Hydration", "Bifrost"]);
   const cycles = select_option(["daily", "weekly", "monthly", "yearly"]);
 
   // Pagination state

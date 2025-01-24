@@ -21,14 +21,14 @@
 
   let loading = $state(false);
   let selectedDate = $state(format(new Date(), "yyyy-MM-dd"));
-  let selectedChain = $state("Ethereum");
+  let selectedChain = $state("Polkadot");
   let selectedAssetType = $state("DeFi");
   let selectedReturnType = $state("");
   let selectedToken = $state("");
 
   let data: any[] = $state([]);
 
-  const chains = select_option(["Ethereum", "BSC", "Polygon"]);
+  const chains = select_option(["Polkadot", "Kusama", "Hydration", "Bifrost"]);
   const assetTypes = select_option(["DeFi", "GameFi", "NFT"]);
   const returnTypes = select_option(["", "Staking", "Farming", "Lending"]);
   const tokens = select_option(["", "ETH", "USDT", "USDC", "DAI"]);
