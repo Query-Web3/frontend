@@ -270,53 +270,61 @@
 
 <div class="max-w-7xl mx-auto">
   <Card class="mb-3" size="none">
-    <h2 class="text-2xl font-bold mb-4">Yield Query</h2>
-
-    <form class="space-y-4" onsubmit={handleSubmit}>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <Label for="date">Date</Label>
+    <form on:submit={handleSubmit} class="grid gap-4">
+      <div class="grid grid-cols-2 gap-4">
+        <!-- 第一行 -->
+        <div class="flex items-center gap-4">
+          <Label class="w-20 whitespace-nowrap">date</Label>
           <input
             type="date"
-            id="date"
+            class="w-full"
             bind:value={selectedDate}
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
-
-        <div>
-          <Label for="chain">Chain</Label>
-          <Select id="chain" bind:value={selectedChain} items={chains} />
-        </div>
-
-        <div>
-          <Label for="assetType">Asset Type</Label>
+        <div class="flex items-center gap-4">
+          <Label class="w-20 whitespace-nowrap">chain</Label>
           <Select
-            id="assetType"
-            bind:value={selectedAssetType}
+            class="w-full"
+            items={chains}
+            bind:value={selectedChain}
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- 第二行 -->
+        <div class="flex items-center gap-4">
+          <Label class="w-20 whitespace-nowrap">asset type</Label>
+          <Select
+            class="w-full"
             items={assetTypes}
+            bind:value={selectedAssetType}
           />
         </div>
+      </div>
 
-        <div>
-          <Label for="returnType">Return Type</Label>
+      <div class="grid grid-cols-2 gap-4">
+        <!-- 第三行 -->
+        <div class="flex items-center gap-4">
+          <Label class="w-20 whitespace-nowrap">return type</Label>
           <Select
-            id="returnType"
-            bind:value={selectedReturnType}
+            class="w-full"
             items={returnTypes}
+            bind:value={selectedReturnType}
           />
         </div>
-
-        <div>
-          <Label for="token">Token</Label>
-          <Select id="token" bind:value={selectedToken} items={tokens} />
+        <div class="flex items-center gap-4">
+          <Label class="w-20 whitespace-nowrap">token</Label>
+          <Select
+            class="w-full"
+            items={tokens}
+            bind:value={selectedToken}
+          />
         </div>
+      </div>
 
-        <div class="flex items-end">
-          <Button type="submit" disabled={loading}>
-            {loading ? "Loading..." : "Query"}
-          </Button>
-        </div>
+      <div class="flex justify-center w-full mt-4">
+        <Button type="submit">Query</Button>
       </div>
     </form>
   </Card>
