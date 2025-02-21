@@ -142,11 +142,14 @@
     try {
       loading = true;
       const response = await api.getYield(query);
-      data = response.data;
-      totalPages = response.total_pages;
+      console.log('API Response:', response); // 添加日志
+      data = response.data || [];
+      totalPages = response.total_pages || 1;
     } catch (error) {
       console.error(error);
       alert("Failed to fetch data");
+      data = [];
+      totalPages = 1;
     } finally {
       loading = false;
     }
@@ -342,7 +345,7 @@
         </div>
       </div>
 
-      <Table>
+      <Table shadow>
         <TableHead>
           <TableHeadCell>Token</TableHeadCell>
           <TableHeadCell>APY</TableHeadCell>
@@ -354,22 +357,24 @@
           <TableHeadCell>24h Transactions</TableHeadCell>
         </TableHead>
         <TableBody>
-          {#each data as row}
+          {#if data && data.length > 0}
+            {#each data as row}
+              <TableBodyRow>
+                <TableBodyCell>{row.token}</TableBodyCell>
+                <TableBodyCell>{(row.apy * 100).toFixed(2)}%</TableBodyCell>
+                <TableBodyCell>{row.tvl_usd?.toLocaleString() || '0'}</TableBodyCell>
+                <TableBodyCell>{row.price_usd?.toLocaleString() || '0'}</TableBodyCell>
+                <TableBodyCell>{row.chain}</TableBodyCell>
+                <TableBodyCell>{row.return_type}</TableBodyCell>
+                <TableBodyCell>{row.volume_24h_usd?.toLocaleString() || '0'}</TableBodyCell>
+                <TableBodyCell>{row.transactions_24h?.toLocaleString() || '0'}</TableBodyCell>
+              </TableBodyRow>
+            {/each}
+          {:else}
             <TableBodyRow>
-              <TableBodyCell>{row.token}</TableBodyCell>
-              <TableBodyCell>{`${(row.apy * 100).toFixed(2)}%`}</TableBodyCell>
-              <TableBodyCell>{row.tvl_usd.toLocaleString()}</TableBodyCell>
-              <TableBodyCell>{row.price_usd.toLocaleString()}</TableBodyCell>
-              <TableBodyCell>{row.chain}</TableBodyCell>
-              <TableBodyCell>{row.return_type}</TableBodyCell>
-              <TableBodyCell
-                >{row.volume_24h_usd.toLocaleString()}</TableBodyCell
-              >
-              <TableBodyCell
-                >{row.transactions_24h.toLocaleString()}</TableBodyCell
-              >
+              <TableBodyCell colspan="8" class="text-center">No data available</TableBodyCell>
             </TableBodyRow>
-          {/each}
+          {/if}
         </TableBody>
       </Table>
     </Card>

@@ -1,1 +1,2 @@
 使用中文
+编写完成的代码需要 `yarn svelte-check` 通过
