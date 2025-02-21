@@ -30,6 +30,9 @@
 		"flowbite": "^2.2.0",
 		"flowbite-svelte": "^0.44.19",
 		"http-api": "https://github.com/iyangdianfeng/http-api.git",
+		"jspdf": "^2.5.2",
+		"jspdf-autotable": "^3.8.4",
+		"xlsx": "^0.18.5",
 		"zod": "3.24.1"
 	},
 	"overrides": {
