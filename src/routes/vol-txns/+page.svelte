@@ -13,8 +13,7 @@
     Pagination,
     type SelectOptionType,
   } from "flowbite-svelte";
-  import { getVolTxns } from "$lib/api";
-  import type { VolTxnsQuery } from "$lib/api";
+  import api, { type VolTxnsQuery } from "$lib/api";
   import { format } from "date-fns";
   import { onMount } from "svelte";
   import { select_option } from "$lib/utils";
@@ -55,7 +54,7 @@
 
     try {
       loading = true;
-      const response = await getVolTxns(query);
+      const response = await api.getVolTxns(query);
       data = response.data;
     } catch (error) {
       // console.error(error);

@@ -4,24 +4,24 @@
   import { onMount } from "svelte";
 
   // 状态变量
-  let volTxnsResult = $state<any>(null);
-  let yieldResult = $state<any>(null);
-  let chainsResult = $state<string[]>([]);
-  let assetTypesResult = $state<string[]>([]);
-  let returnTypesResult = $state<string[]>([]);
-  let tokensResult = $state<string[]>([]);
+  let volTxnsResult: { error?: string; data?: any } = $state({});
+  let yieldResult: { error?: string; data?: any } = $state({});
+  let chainsResult: string[] = $state([]);
+  let assetTypesResult: string[] = $state([]);
+  let returnTypesResult: string[] = $state([]);
+  let tokensResult: { all?: string[]; byChain?: string[]; byAssetType?: string[]; error?: string } = $state({});
 
   // 测试交易量数据接口
   async function testVolTxns() {
     try {
       const result = await api.getVolTxns({
-        from_date: "2022-01-01",
-        to_date: "2022-01-31",
-        chain: "Hydration",
+        chain: "Polkadot",
+        from_date: "2024-02-21",
+        to_date: "2024-02-21",
         cycle: "daily"
       });
-      volTxnsResult = result;
-    } catch (error) {
+      volTxnsResult = { data: result };
+    } catch (error: any) {
       volTxnsResult = { error: error.message };
     }
   }
@@ -30,15 +30,12 @@
   async function testYield() {
     try {
       const result = await api.getYield({
-        date: "2022-01-01",
-        chain: "Hydration",
+        chain: "Polkadot",
         asset_type: "DeFi",
-        page: 1,
-        page_size: 10,
-        return_type: "Staking"
+        date: "2024-02-21",
       });
-      yieldResult = result;
-    } catch (error) {
+      yieldResult = { data: result };
+    } catch (error: any) {
       yieldResult = { error: error.message };
     }
   }
@@ -46,11 +43,10 @@
   // 测试获取链列表接口
   async function testGetChains() {
     try {
-      const result = await api.getChains();
-      chainsResult = result;
+      chainsResult = await api.getChains();
       console.log("预期的链列表:", CHAINS);
-      console.log("实际获取的链列表:", result);
-    } catch (error) {
+      console.log("实际获取的链列表:", chainsResult);
+    } catch (error: any) {
       chainsResult = [`错误: ${error.message}`];
     }
   }
@@ -58,11 +54,10 @@
   // 测试获取资产类型列表接口
   async function testGetAssetTypes() {
     try {
-      const result = await api.getAssetTypes();
-      assetTypesResult = result;
+      assetTypesResult = await api.getAssetTypes();
       console.log("预期的资产类型:", ASSET_TYPES);
-      console.log("实际获取的资产类型:", result);
-    } catch (error) {
+      console.log("实际获取的资产类型:", assetTypesResult);
+    } catch (error: any) {
       assetTypesResult = [`错误: ${error.message}`];
     }
   }
@@ -70,11 +65,10 @@
   // 测试获取收益类型列表接口
   async function testGetReturnTypes() {
     try {
-      const result = await api.getReturnTypes();
-      returnTypesResult = result;
+      returnTypesResult = await api.getReturnTypes();
       console.log("预期的收益类型:", RETURN_TYPES);
-      console.log("实际获取的收益类型:", result);
-    } catch (error) {
+      console.log("实际获取的收益类型:", returnTypesResult);
+    } catch (error: any) {
       returnTypesResult = [`错误: ${error.message}`];
     }
   }
@@ -82,25 +76,18 @@
   // 测试获取代币列表接口
   async function testGetTokens() {
     try {
-      // 测试不同的组合
       const results = await Promise.all([
-        // 无参数
         api.getTokens(),
-        // 只有chain
-        api.getTokens({ chain: "Hydration" }),
-        // 只有asset_type
+        api.getTokens({ chain: "Polkadot" }),
         api.getTokens({ asset_type: "DeFi" }),
-        // 两个参数都有
-        api.getTokens({ chain: "Hydration", asset_type: "DeFi" })
       ]);
-      
+
       tokensResult = {
         all: results[0],
         byChain: results[1],
-        byAssetType: results[2],
-        byBoth: results[3]
+        byAssetType: results[2]
       };
-    } catch (error) {
+    } catch (error: any) {
       tokensResult = { error: error.message };
     }
   }
