@@ -12,16 +12,16 @@
     Card,
     type SelectOptionType,
   } from "flowbite-svelte";
-  import api, { 
-    CHAINS, 
-    ASSET_TYPES, 
-    RETURN_TYPES, 
-    type Chain, 
-    type AssetType, 
+  import api, {
+    CHAINS,
+    ASSET_TYPES,
+    RETURN_TYPES,
+    type Chain,
+    type AssetType,
     type ReturnType,
     type YieldQuery,
     type YieldResponse,
-    type PageResponse
+    type PageResponse,
   } from "$lib/api";
   import { format } from "date-fns";
   import { select_option } from "$lib/utils";
@@ -69,8 +69,8 @@
 
       chains = select_option(chainsData);
       assetTypes = select_option(assetTypesData);
-      returnTypes = select_option(["", ...returnTypesData] as ReturnType[]); // 添加空选项
-      tokens = select_option(["", ...tokensData]); // 添加空选项
+      returnTypes = select_option([...returnTypesData] as ReturnType[]); // 添加空选项
+      tokens = select_option([...tokensData]); // 添加空选项
 
       // 如果当前选择的值不在选项中，重置为第一个选项
       if (!chainsData.includes(selectedChain)) {
@@ -362,8 +362,12 @@
               <TableBodyCell>{row.price_usd.toLocaleString()}</TableBodyCell>
               <TableBodyCell>{row.chain}</TableBodyCell>
               <TableBodyCell>{row.return_type}</TableBodyCell>
-              <TableBodyCell>{row.volume_24h_usd.toLocaleString()}</TableBodyCell>
-              <TableBodyCell>{row.transactions_24h.toLocaleString()}</TableBodyCell>
+              <TableBodyCell
+                >{row.volume_24h_usd.toLocaleString()}</TableBodyCell
+              >
+              <TableBodyCell
+                >{row.transactions_24h.toLocaleString()}</TableBodyCell
+              >
             </TableBodyRow>
           {/each}
         </TableBody>
