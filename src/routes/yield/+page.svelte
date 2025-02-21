@@ -301,6 +301,14 @@
             bind:value={selectedAssetType}
           />
         </div>
+        <div class="flex items-center gap-4">
+          <Label class="w-20 whitespace-nowrap">token</Label>
+          <Select
+            class="w-full"
+            items={tokens}
+            bind:value={selectedToken}
+          />
+        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -311,14 +319,6 @@
             class="w-full"
             items={returnTypes}
             bind:value={selectedReturnType}
-          />
-        </div>
-        <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">token</Label>
-          <Select
-            class="w-full"
-            items={tokens}
-            bind:value={selectedToken}
           />
         </div>
       </div>
