@@ -278,40 +278,61 @@
   }
 
   function exportToExcel() {
+    // Format numbers
+    const formatNumber = (num: number | undefined | null): string => {
+      if (num === undefined || num === null) return "0";
+      return num.toLocaleString();
+    };
+
     // Create workbook
     const wb = XLSX.utils.book_new();
 
+    // Add title and query info to worksheet
+    const title = [
+      "Yield Query Report",
+      `Date: ${selectedDate}`,
+      `Chain: ${selectedChain}`,
+      `Asset Type: ${selectedAssetType}`,
+      `Return Type: ${selectedReturnType || "All"}`,
+      `Token: ${selectedToken || "All"}`,
+    ];
+
+    // Data headers
+    const headers = [
+      "Token",
+      "APY",
+      "TVL (USD)",
+      "Price (USD)",
+      "Chain",
+      "Return Type",
+      "24h Volume",
+      "24h Txns",
+    ];
+
     // Convert data to worksheet format
     const wsData = [
-      // Headers
-      [
-        "Token",
-        "APY",
-        "TVL (USD)",
-        "Price (USD)",
-        "Chain",
-        "Return Type",
-        "24h Volume (USD)",
-        "24h Transactions",
-      ],
-      // Data rows
+      ...title.map(line => [line]),
+      [""], // Empty row after title
+      headers,
       ...data.map((row) => [
-        row.token,
-        `${(row.apy * 100).toFixed(2)}%`,
-        row.tvl_usd.toLocaleString(),
-        row.price_usd.toLocaleString(),
-        row.chain,
-        row.return_type,
-        row.volume_24h_usd.toLocaleString(),
-        row.transactions_24h.toLocaleString(),
+        row.token || "-",
+        `${((row.apy || 0) * 100).toFixed(2)}%`,
+        formatNumber(row.tvl_usd),
+        formatNumber(row.price_usd),
+        row.chain || "-",
+        row.return_type || "-",
+        formatNumber(row.volume_24h_usd),
+        formatNumber(row.transactions_24h),
       ]),
+      [""], // Empty row before footer
+      [`Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`],
     ];
 
     // Create worksheet
     const ws = XLSX.utils.aoa_to_sheet(wsData);
 
     // Set column widths
-    const colWidths = [
+    ws["!cols"] = [
       { wch: 15 }, // Token
       { wch: 10 }, // APY
       { wch: 15 }, // TVL
@@ -319,14 +340,44 @@
       { wch: 15 }, // Chain
       { wch: 15 }, // Return Type
       { wch: 15 }, // Volume
-      { wch: 15 }, // Transactions
+      { wch: 12 }, // Txns
     ];
-    ws["!cols"] = colWidths;
+
+    // Style cells
+    const range = XLSX.utils.decode_range(ws["!ref"] || "A1");
+    for (let R = 0; R <= range.e.r; R++) {
+      for (let C = 0; C <= range.e.c; C++) {
+        const cell = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[cell]) continue;
+
+        // Initialize style if not exists
+        if (!ws[cell].s) ws[cell].s = {};
+
+        // Title styles
+        if (R < title.length) {
+          ws[cell].s.font = { bold: true, sz: 14 };
+        }
+        // Header styles
+        else if (R === title.length + 1) {
+          ws[cell].s = {
+            font: { bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "428BCA" } },
+            alignment: { horizontal: "center" },
+          };
+        }
+        // Data styles
+        else if (R > title.length + 1 && R < range.e.r) {
+          ws[cell].s.alignment = {
+            horizontal: [0, 4, 5].includes(C) ? "left" : "right",
+          };
+        }
+      }
+    }
 
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, "Yield Data");
 
-    // Generate Excel file and trigger download
+    // Save file
     XLSX.writeFile(wb, `yield-report-${selectedDate}.xlsx`);
   }
 </script>
