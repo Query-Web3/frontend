@@ -77,7 +77,7 @@ export const api = axios.create({
 export default {
   // 获取交易量数据
   getVolTxns: async (params: VolTxnsQuery): Promise<PageResponse<VolTxnsResponse>> => {
-    const response = await api.post("/vol-txn", params);
+    const response = await api.post("/vol-txns", params);
     return response.data;
   },
 
