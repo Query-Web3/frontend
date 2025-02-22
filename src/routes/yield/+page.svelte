@@ -50,7 +50,7 @@
   let returnTypes = $state<SelectOptionType<ReturnType>[]>([]);
   let tokens = $state<SelectOptionType<string>[]>([]);
 
-  // Get current page from URL parameters
+  // 获取当前页面
   let currentPage = $derived(
     parseInt(page.url.searchParams.get("page") || "1"),
   );
@@ -126,7 +126,7 @@
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
     if (!selectedDate) {
-      alert("Please select a date");
+      alert("请选择日期");
       return;
     }
 
@@ -168,11 +168,11 @@
     const margin = 14;
     const usableWidth = pageWidth - (2 * margin);
 
-    // Set font
+    // 设置字体
     doc.setFont("helvetica");
     doc.setFontSize(14);
 
-    // Add title and query conditions
+    // 添加标题和查询条件
     const title = [
       "Yield Query Report",
       `Date: ${selectedDate}`,
@@ -188,7 +188,7 @@
       yPos += 7;
     });
 
-    // Calculate column widths as percentages of usable width
+    // 计算列宽
     const colWidths = {
       0: usableWidth * 0.15, // Token
       1: usableWidth * 0.08, // APY
@@ -200,13 +200,13 @@
       7: usableWidth * 0.11, // Txns
     };
 
-    // Format numbers
+    // 格式化数字
     const formatNumber = (num: number | undefined | null): string => {
       if (num === undefined || num === null) return "0";
       return num.toLocaleString();
     };
 
-    // Generate table
+    // 生成表格
     autoTable(doc, {
       startY: yPos + 5,
       margin: { left: margin, right: margin },
@@ -255,7 +255,7 @@
       },
     });
 
-    // Add footer
+    // 添加页脚
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -273,21 +273,21 @@
       );
     }
 
-    // Save file
+    // 保存文件
     doc.save(`yield-report-${selectedDate}.pdf`);
   }
 
   function exportToExcel() {
-    // Format numbers
+    // 数字格式化函数
     const formatNumber = (num: number | undefined | null): string => {
       if (num === undefined || num === null) return "0";
       return num.toLocaleString();
     };
 
-    // Create workbook
+    // 创建工作簿
     const wb = XLSX.utils.book_new();
 
-    // Add title and query info to worksheet
+    // 添加标题和查询信息
     const title = [
       "Yield Query Report",
       `Date: ${selectedDate}`,
@@ -297,7 +297,7 @@
       `Token: ${selectedToken || "All"}`,
     ];
 
-    // Data headers
+    // 表格表头
     const headers = [
       "Token",
       "APY",
@@ -309,10 +309,10 @@
       "24h Txns",
     ];
 
-    // Convert data to worksheet format
+    // 转换数据为工作表格式
     const wsData = [
       ...title.map(line => [line]),
-      [""], // Empty row after title
+      [""], // 标题后的空行
       headers,
       ...data.map((row) => [
         row.token || "-",
@@ -324,40 +324,40 @@
         formatNumber(row.volume_24h_usd),
         formatNumber(row.transactions_24h),
       ]),
-      [""], // Empty row before footer
+      [""], // 页脚前的空行
       [`Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`],
     ];
 
-    // Create worksheet
+    // 创建工作表
     const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-    // Set column widths
+    // 设置列宽
     ws["!cols"] = [
-      { wch: 15 }, // Token
-      { wch: 10 }, // APY
-      { wch: 15 }, // TVL
-      { wch: 15 }, // Price
-      { wch: 15 }, // Chain
-      { wch: 15 }, // Return Type
-      { wch: 15 }, // Volume
-      { wch: 12 }, // Txns
+      { wch: 15 }, // Token 列
+      { wch: 10 }, // APY 列
+      { wch: 15 }, // TVL 列
+      { wch: 15 }, // Price 列
+      { wch: 15 }, // Chain 列
+      { wch: 15 }, // Return Type 列
+      { wch: 15 }, // Volume 列
+      { wch: 12 }, // Txns 列
     ];
 
-    // Style cells
+    // 设置单元格样式
     const range = XLSX.utils.decode_range(ws["!ref"] || "A1");
     for (let R = 0; R <= range.e.r; R++) {
       for (let C = 0; C <= range.e.c; C++) {
         const cell = XLSX.utils.encode_cell({ r: R, c: C });
         if (!ws[cell]) continue;
 
-        // Initialize style if not exists
+        // 初始化样式对象
         if (!ws[cell].s) ws[cell].s = {};
 
-        // Title styles
+        // 标题样式
         if (R < title.length) {
           ws[cell].s.font = { bold: true, sz: 14 };
         }
-        // Header styles
+        // 表头样式
         else if (R === title.length + 1) {
           ws[cell].s = {
             font: { bold: true, color: { rgb: "FFFFFF" } },
@@ -365,7 +365,7 @@
             alignment: { horizontal: "center" },
           };
         }
-        // Data styles
+        // 数据行样式
         else if (R > title.length + 1 && R < range.e.r) {
           ws[cell].s.alignment = {
             horizontal: [0, 4, 5].includes(C) ? "left" : "right",
@@ -374,10 +374,10 @@
       }
     }
 
-    // Add worksheet to workbook
+    // 将工作表添加到工作簿
     XLSX.utils.book_append_sheet(wb, ws, "Yield Data");
 
-    // Save file
+    // 保存文件
     XLSX.writeFile(wb, `yield-report-${selectedDate}.xlsx`);
   }
 </script>
@@ -388,11 +388,11 @@
       <div class="grid grid-cols-2 gap-4">
         <!-- 第一行 -->
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">date</Label>
+          <Label class="w-20 whitespace-nowrap">日期</Label>
           <input type="date" class="w-full" bind:value={selectedDate} />
         </div>
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">chain</Label>
+          <Label class="w-20 whitespace-nowrap">链</Label>
           <Select class="w-full" items={chains} bind:value={selectedChain} />
         </div>
       </div>
@@ -400,7 +400,7 @@
       <div class="grid grid-cols-2 gap-4">
         <!-- 第二行 -->
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">asset type</Label>
+          <Label class="w-20 whitespace-nowrap">资产类型</Label>
           <Select
             class="w-full"
             items={assetTypes}
@@ -408,7 +408,7 @@
           />
         </div>
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">token</Label>
+          <Label class="w-20 whitespace-nowrap">代币</Label>
           <Select class="w-full" items={tokens} bind:value={selectedToken} />
         </div>
       </div>
@@ -416,7 +416,7 @@
       <div class="grid grid-cols-2 gap-4">
         <!-- 第三行 -->
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">return type</Label>
+          <Label class="w-20 whitespace-nowrap">收益类型</Label>
           <Select
             class="w-full"
             items={returnTypes}
@@ -426,7 +426,7 @@
       </div>
 
       <div class="flex justify-center w-full mt-4">
-        <Button type="submit">Query</Button>
+        <Button type="submit">查询</Button>
       </div>
     </form>
   </Card>
@@ -435,14 +435,14 @@
     <Card class="mb-3" size="none">
       <Table shadow>
         <TableHead>
-          <TableHeadCell>Token</TableHeadCell>
+          <TableHeadCell>代币</TableHeadCell>
           <TableHeadCell>APY</TableHeadCell>
           <TableHeadCell>TVL (USD)</TableHeadCell>
-          <TableHeadCell>Price (USD)</TableHeadCell>
-          <TableHeadCell>Chain</TableHeadCell>
-          <TableHeadCell>Return Type</TableHeadCell>
-          <TableHeadCell>24h Volume (USD)</TableHeadCell>
-          <TableHeadCell>24h Transactions</TableHeadCell>
+          <TableHeadCell>价格 (USD)</TableHeadCell>
+          <TableHeadCell>链</TableHeadCell>
+          <TableHeadCell>收益类型</TableHeadCell>
+          <TableHeadCell>24小时交易量 (USD)</TableHeadCell>
+          <TableHeadCell>24小时交易次数</TableHeadCell>
         </TableHead>
         <TableBody>
           {#if data && data.length > 0}
@@ -470,7 +470,7 @@
           {:else}
             <TableBodyRow>
               <TableBodyCell colspan="8" class="text-center"
-                >No data available</TableBodyCell
+                >无数据</TableBodyCell
               >
             </TableBodyRow>
           {/if}
@@ -481,11 +481,11 @@
         <div class="flex items-center gap-4">
           <Button color="light" on:click={exportToPDF}>
             <IconFileTypePdf class="w-5 h-5 mr-2" />
-            Export PDF
+            导出 PDF
           </Button>
           <Button color="light" on:click={exportToExcel}>
             <IconFileTypeXls class="w-5 h-5 mr-2" />
-            Export Excel
+            导出 Excel
           </Button>
         </div>
         <div class="flex items-center gap-4">
