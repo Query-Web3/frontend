@@ -33,9 +33,10 @@
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import CustomPagination from "$lib/components/CustomPagination.svelte";
+  import { dev } from "$app/environment";
 
   let loading = $state(false);
-  let selectedDate = $state(format(new Date(), "yyyy-MM-dd"));
+  let selectedDate = $state(dev ? "2024-12-08" : format(new Date(), "yyyy-MM-dd"));
   let selectedChain = $state<Chain>("Hydration");
   let selectedAssetType = $state<AssetType>("DeFi");
   let selectedReturnType = $state<ReturnType>("Staking");
@@ -163,54 +164,116 @@
 
   function exportToPDF() {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 14;
+    const usableWidth = pageWidth - (2 * margin);
 
-    // Add title
-    doc.setFontSize(16);
-    doc.text(
-      [
-        "Yield Report",
-        `Chain: ${selectedChain}`,
-        `Asset Type: ${selectedAssetType}`,
-        `Return Type: ${selectedReturnType || "All"}`,
-        `Token: ${selectedToken || "All"}`,
-        `Date: ${selectedDate}`,
-      ],
-      14,
-      30,
-    );
+    // Set font
+    doc.setFont("helvetica");
+    doc.setFontSize(14);
 
-    // Define table headers based on your data structure
-    const headers = [
-      "Token",
-      "APY",
-      "TVL (USD)",
-      "Price (USD)",
-      "Chain",
-      "Return Type",
-      "24h Volume (USD)",
-      "24h Transactions",
+    // Add title and query conditions
+    const title = [
+      "Yield Query Report",
+      `Date: ${selectedDate}`,
+      `Chain: ${selectedChain}`,
+      `Asset Type: ${selectedAssetType}`,
+      `Return Type: ${selectedReturnType || "All"}`,
+      `Token: ${selectedToken || "All"}`,
     ];
 
-    // Convert data to table format
-    const tableData = data.map((row) => [
-      row.token,
-      `${(row.apy * 100).toFixed(2)}%`,
-      row.tvl_usd.toLocaleString(),
-      row.price_usd.toLocaleString(),
-      row.chain,
-      row.return_type,
-      row.volume_24h_usd.toLocaleString(),
-      row.transactions_24h.toLocaleString(),
-    ]);
-
-    // Generate the table
-    autoTable(doc, {
-      head: [headers],
-      body: tableData,
-      startY: 50,
+    let yPos = 20;
+    title.forEach((line) => {
+      doc.text(line, margin, yPos);
+      yPos += 7;
     });
 
-    // Save the PDF
+    // Calculate column widths as percentages of usable width
+    const colWidths = {
+      0: usableWidth * 0.15, // Token
+      1: usableWidth * 0.08, // APY
+      2: usableWidth * 0.15, // TVL
+      3: usableWidth * 0.15, // Price
+      4: usableWidth * 0.12, // Chain
+      5: usableWidth * 0.12, // Return Type
+      6: usableWidth * 0.12, // Volume
+      7: usableWidth * 0.11, // Txns
+    };
+
+    // Format numbers
+    const formatNumber = (num: number | undefined | null): string => {
+      if (num === undefined || num === null) return "0";
+      return num.toLocaleString();
+    };
+
+    // Generate table
+    autoTable(doc, {
+      startY: yPos + 5,
+      margin: { left: margin, right: margin },
+      head: [[
+        "Token",
+        "APY",
+        "TVL (USD)",
+        "Price (USD)",
+        "Chain",
+        "Return Type",
+        "24h Volume",
+        "24h Txns",
+      ]],
+      body: data.map((row) => [
+        row.token || "-",
+        `${((row.apy || 0) * 100).toFixed(2)}%`,
+        formatNumber(row.tvl_usd),
+        formatNumber(row.price_usd),
+        row.chain || "-",
+        row.return_type || "-",
+        formatNumber(row.volume_24h_usd),
+        formatNumber(row.transactions_24h),
+      ]),
+      columnStyles: {
+        0: { cellWidth: colWidths[0] },
+        1: { cellWidth: colWidths[1], halign: "right" },
+        2: { cellWidth: colWidths[2], halign: "right" },
+        3: { cellWidth: colWidths[3], halign: "right" },
+        4: { cellWidth: colWidths[4] },
+        5: { cellWidth: colWidths[5] },
+        6: { cellWidth: colWidths[6], halign: "right" },
+        7: { cellWidth: colWidths[7], halign: "right" },
+      },
+      styles: {
+        fontSize: 9,
+        cellPadding: 1,
+      },
+      headStyles: {
+        fillColor: [66, 139, 202],
+        textColor: 255,
+        fontSize: 9,
+        fontStyle: "bold",
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245],
+      },
+    });
+
+    // Add footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: "center" }
+      );
+      doc.text(
+        `Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`,
+        margin,
+        doc.internal.pageSize.height - 10
+      );
+    }
+
+    // Save file
     doc.save(`yield-report-${selectedDate}.pdf`);
   }
 
