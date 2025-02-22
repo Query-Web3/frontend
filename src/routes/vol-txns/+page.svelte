@@ -19,6 +19,8 @@
   import { select_option } from "$lib/utils";
   import { IconFileTypePdf, IconFileTypeXls } from "@tabler/icons-svelte";
   import { dev } from "$app/environment";
+  import jsPDF from "jspdf";
+  import autoTable from "jspdf-autotable";
 
   let loading = $state(false);
   let fromDate = $state(dev ? "2024-10-18" : format(new Date(), "yyyy-MM-dd"));
@@ -99,7 +101,69 @@
 
   // Export functions will be implemented later
   async function exportToPDF() {
-    // Implementation for PDF export
+    const doc = new jsPDF();
+    const title = "Volume & Transactions Report";
+    const subtitle = `Chain: ${selectedChain}, Cycle: ${selectedCycle}`;
+    const dateRange = `From ${fromDate} to ${toDate}`;
+    const exportTime = `Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`;
+
+    // 添加标题
+    doc.setFontSize(16);
+    doc.text(title, 14, 20);
+    
+    // 添加子标题
+    doc.setFontSize(11);
+    doc.text(subtitle, 14, 30);
+    doc.text(dateRange, 14, 35);
+    doc.text(exportTime, 14, 40);
+
+    // 准备表格数据
+    const tableRows = data.map(item => [
+      format(new Date(item.time), "yyyy-MM-dd"),
+      formatNumber(item.volume),
+      formatPercent(item.yoy),
+      formatPercent(item.qoq),
+      formatNumber(item.txns),
+      formatPercent(item.txns_yoy),
+      formatPercent(item.txns_qoq),
+    ]);
+
+    // 添加表格
+    autoTable(doc, {
+      head: [[
+        'Time',
+        'Volume ($)',
+        'Volume YoY',
+        'Volume QoQ',
+        'Txns',
+        'Txns YoY',
+        'Txns QoQ',
+      ]],
+      body: tableRows,
+      startY: 45,
+      theme: 'striped',
+      headStyles: {
+        fillColor: [66, 139, 202],
+        textColor: 255,
+        fontSize: 10,
+      },
+      bodyStyles: {
+        fontSize: 9,
+      },
+      columnStyles: {
+        0: { cellWidth: 25 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 25 },
+        6: { cellWidth: 25 },
+      },
+    });
+
+    // 保存文件
+    const fileName = `vol-txns-report-${selectedChain}-${selectedCycle}-${format(new Date(), "yyyyMMdd")}.pdf`;
+    doc.save(fileName);
   }
 
   async function exportToExcel() {
