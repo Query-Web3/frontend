@@ -142,7 +142,7 @@
     try {
       loading = true;
       const response = await api.getYield(query);
-      console.log('API Response:', response); // 添加日志
+      console.log("API Response:", response); // 添加日志
       data = response.data || [];
       totalPages = response.total_pages || 1;
     } catch (error) {
@@ -275,19 +275,11 @@
         <!-- 第一行 -->
         <div class="flex items-center gap-4">
           <Label class="w-20 whitespace-nowrap">date</Label>
-          <input
-            type="date"
-            class="w-full"
-            bind:value={selectedDate}
-          />
+          <input type="date" class="w-full" bind:value={selectedDate} />
         </div>
         <div class="flex items-center gap-4">
           <Label class="w-20 whitespace-nowrap">chain</Label>
-          <Select
-            class="w-full"
-            items={chains}
-            bind:value={selectedChain}
-          />
+          <Select class="w-full" items={chains} bind:value={selectedChain} />
         </div>
       </div>
 
@@ -303,11 +295,7 @@
         </div>
         <div class="flex items-center gap-4">
           <Label class="w-20 whitespace-nowrap">token</Label>
-          <Select
-            class="w-full"
-            items={tokens}
-            bind:value={selectedToken}
-          />
+          <Select class="w-full" items={tokens} bind:value={selectedToken} />
         </div>
       </div>
 
@@ -331,7 +319,51 @@
 
   {#if data.length > 0}
     <Card class="mb-3" size="none">
-      <div class="flex justify-between items-center mb-4">
+      <Table shadow>
+        <TableHead>
+          <TableHeadCell>Token</TableHeadCell>
+          <TableHeadCell>APY</TableHeadCell>
+          <TableHeadCell>TVL (USD)</TableHeadCell>
+          <TableHeadCell>Price (USD)</TableHeadCell>
+          <TableHeadCell>Chain</TableHeadCell>
+          <TableHeadCell>Return Type</TableHeadCell>
+          <TableHeadCell>24h Volume (USD)</TableHeadCell>
+          <TableHeadCell>24h Transactions</TableHeadCell>
+        </TableHead>
+        <TableBody>
+          {#if data && data.length > 0}
+            {#each data as row}
+              <TableBodyRow>
+                <TableBodyCell>{row.token}</TableBodyCell>
+                <TableBodyCell>{(row.apy * 100).toFixed(2)}%</TableBodyCell>
+                <TableBodyCell
+                  >{row.tvl_usd?.toLocaleString() || "0"}</TableBodyCell
+                >
+                <TableBodyCell
+                  >{row.price_usd?.toLocaleString() || "0"}</TableBodyCell
+                >
+                <TableBodyCell>{row.chain}</TableBodyCell>
+                <TableBodyCell>{row.return_type}</TableBodyCell>
+                <TableBodyCell
+                  >{row.volume_24h_usd?.toLocaleString() || "0"}</TableBodyCell
+                >
+                <TableBodyCell
+                  >{row.transactions_24h?.toLocaleString() ||
+                    "0"}</TableBodyCell
+                >
+              </TableBodyRow>
+            {/each}
+          {:else}
+            <TableBodyRow>
+              <TableBodyCell colspan="8" class="text-center"
+                >No data available</TableBodyCell
+              >
+            </TableBodyRow>
+          {/if}
+        </TableBody>
+      </Table>
+
+      <div class="flex justify-between items-center mt-4">
         <div class="flex items-center gap-4">
           <Button color="light" on:click={exportToPDF}>
             <IconFileTypePdf class="w-5 h-5 mr-2" />
@@ -352,39 +384,6 @@
           />
         </div>
       </div>
-
-      <Table shadow>
-        <TableHead>
-          <TableHeadCell>Token</TableHeadCell>
-          <TableHeadCell>APY</TableHeadCell>
-          <TableHeadCell>TVL (USD)</TableHeadCell>
-          <TableHeadCell>Price (USD)</TableHeadCell>
-          <TableHeadCell>Chain</TableHeadCell>
-          <TableHeadCell>Return Type</TableHeadCell>
-          <TableHeadCell>24h Volume (USD)</TableHeadCell>
-          <TableHeadCell>24h Transactions</TableHeadCell>
-        </TableHead>
-        <TableBody>
-          {#if data && data.length > 0}
-            {#each data as row}
-              <TableBodyRow>
-                <TableBodyCell>{row.token}</TableBodyCell>
-                <TableBodyCell>{(row.apy * 100).toFixed(2)}%</TableBodyCell>
-                <TableBodyCell>{row.tvl_usd?.toLocaleString() || '0'}</TableBodyCell>
-                <TableBodyCell>{row.price_usd?.toLocaleString() || '0'}</TableBodyCell>
-                <TableBodyCell>{row.chain}</TableBodyCell>
-                <TableBodyCell>{row.return_type}</TableBodyCell>
-                <TableBodyCell>{row.volume_24h_usd?.toLocaleString() || '0'}</TableBodyCell>
-                <TableBodyCell>{row.transactions_24h?.toLocaleString() || '0'}</TableBodyCell>
-              </TableBodyRow>
-            {/each}
-          {:else}
-            <TableBodyRow>
-              <TableBodyCell colspan="8" class="text-center">No data available</TableBodyCell>
-            </TableBodyRow>
-          {/if}
-        </TableBody>
-      </Table>
     </Card>
   {/if}
 </div>
