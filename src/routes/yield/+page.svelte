@@ -270,7 +270,7 @@
 
 <div class="max-w-7xl mx-auto">
   <Card class="mb-3" size="none">
-    <form on:submit={handleSubmit} class="grid gap-4">
+    <form onsubmit={handleSubmit} class="grid gap-4">
       <div class="grid grid-cols-2 gap-4">
         <!-- 第一行 -->
         <div class="flex items-center gap-4">
