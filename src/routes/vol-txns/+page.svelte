@@ -13,29 +13,56 @@
     Pagination,
     type SelectOptionType,
   } from "flowbite-svelte";
-  import api, { type VolTxnsQuery } from "$lib/api";
+  import api, { type VolTxnsQuery, type VolTxnsResponse } from "$lib/api";
   import { format } from "date-fns";
   import { onMount } from "svelte";
   import { select_option } from "$lib/utils";
   import { IconFileTypePdf, IconFileTypeXls } from "@tabler/icons-svelte";
+  import { dev } from "$app/environment";
 
   let loading = $state(false);
-  let fromDate = $state(format(new Date(), "yyyy-MM-dd"));
-  let toDate = $state(format(new Date(), "yyyy-MM-dd"));
-  let selectedChain = $state("Polkadot");
+  let fromDate = $state(dev ? "2024-10-18" : format(new Date(), "yyyy-MM-dd"));
+  let toDate = $state(dev ? "2025-01-26" : format(new Date(), "yyyy-MM-dd"));
+  let selectedChain = $state(dev ? "Hydration" : "Polkadot");
   let selectedCycle = $state("daily");
-  let data: any[] = $state([]);
+  let data = $state<VolTxnsResponse[]>([]);
+  let totalPages = $state(1);
+  let totalItems = $state(0);
 
+  // 选项数据
   const chains = select_option(["Polkadot", "Kusama", "Hydration", "Bifrost"]);
   const cycles = select_option(["daily", "weekly", "monthly", "yearly"]);
 
-  // Pagination state
+  // 分页状态
   let currentPage = $state(1);
   let itemsPerPage = $state(10);
 
   onMount(() => {
     handleSubmit();
   });
+
+  // 格式化数字
+  const formatNumber = (num: number | undefined | null | string): string => {
+    if (num === undefined || num === null) return "-";
+    const value = typeof num === 'string' ? parseFloat(num) : num;
+    if (isNaN(value)) return "-";
+    return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  };
+
+  // 格式化百分比
+  const formatPercent = (num: number | undefined | null | string): string => {
+    if (num === undefined || num === null) return "-";
+    const value = typeof num === 'string' ? parseFloat(num) : num;
+    if (isNaN(value)) return "-";
+    return `${value.toFixed(2)}%`;
+  };
+
+  // 检查是否为正数
+  const isPositive = (num: number | undefined | null | string): boolean => {
+    if (num === undefined || num === null) return false;
+    const value = typeof num === 'string' ? parseFloat(num) : num;
+    return !isNaN(value) && value >= 0;
+  };
 
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
@@ -55,16 +82,22 @@
     try {
       loading = true;
       const response = await api.getVolTxns(query);
-      data = response.data;
+      console.log('Response:', response);
+      data = response.data || [];
+      // 更新分页信息
+      currentPage = response.current_page || 1;
+      totalPages = response.total_pages || 1;
+      totalItems = response.total_items || 0;
     } catch (error) {
-      // console.error(error);
-      // alert("Failed to fetch data");
+      console.error(error);
+      alert("Failed to fetch data");
+      data = [];
     } finally {
       loading = false;
     }
   }
 
-  // Export functions
+  // Export functions will be implemented later
   async function exportToPDF() {
     // Implementation for PDF export
   }
@@ -124,34 +157,32 @@
     <Card class="mb-3" size="none">
       <Table striped={true}>
         <TableHead>
-          <TableHeadCell>time</TableHeadCell>
-          <TableHeadCell>vol($)</TableHeadCell>
-          <TableHeadCell>yoy</TableHeadCell>
-          <TableHeadCell>qoq</TableHeadCell>
-          <TableHeadCell>txns</TableHeadCell>
-          <TableHeadCell>yoy</TableHeadCell>
-          <TableHeadCell>qoq</TableHeadCell>
+          <TableHeadCell>Time</TableHeadCell>
+          <TableHeadCell>Volume ($)</TableHeadCell>
+          <TableHeadCell>Volume YoY</TableHeadCell>
+          <TableHeadCell>Volume QoQ</TableHeadCell>
+          <TableHeadCell>Txns</TableHeadCell>
+          <TableHeadCell>Txns YoY</TableHeadCell>
+          <TableHeadCell>Txns QoQ</TableHeadCell>
         </TableHead>
         <TableBody>
           {#each data as item}
             <TableBodyRow>
-              <TableBodyCell
-                >{format(new Date(item.time), "yyyy-MM-dd")}</TableBodyCell
-              >
-              <TableBodyCell>{item.volume.toFixed(2)}</TableBodyCell>
-              <TableBodyCell
-                >{item.yoy ? `${item.yoy.toFixed(2)}%` : "-"}</TableBodyCell
-              >
-              <TableBodyCell
-                >{item.qoq ? `${item.qoq.toFixed(2)}%` : "-"}</TableBodyCell
-              >
-              <TableBodyCell>{item.txns.toLocaleString()}</TableBodyCell>
-              <TableBodyCell
-                >{item.txns_yoy
-                  ? `${item.txns_yoy.toFixed(2)}%`
-                  : "-"}</TableBodyCell
-              >
-              <TableBodyCell>{item.txns.toLocaleString()}</TableBodyCell>
+              <TableBodyCell>{format(new Date(item.time), "yyyy-MM-dd")}</TableBodyCell>
+              <TableBodyCell>{formatNumber(item.volume)}</TableBodyCell>
+              <TableBodyCell class={isPositive(item.yoy) ? "text-green-600" : "text-red-600"}>
+                {formatPercent(item.yoy)}
+              </TableBodyCell>
+              <TableBodyCell class={isPositive(item.qoq) ? "text-green-600" : "text-red-600"}>
+                {formatPercent(item.qoq)}
+              </TableBodyCell>
+              <TableBodyCell>{formatNumber(item.txns)}</TableBodyCell>
+              <TableBodyCell class={isPositive(item.txns_yoy) ? "text-green-600" : "text-red-600"}>
+                {formatPercent(item.txns_yoy)}
+              </TableBodyCell>
+              <TableBodyCell class={isPositive(item.txns_qoq) ? "text-green-600" : "text-red-600"}>
+                {formatPercent(item.txns_qoq)}
+              </TableBodyCell>
             </TableBodyRow>
           {/each}
         </TableBody>
@@ -168,18 +199,6 @@
           <IconFileTypeXls class="w-5 h-5 mr-2" />
           Export Excel
         </Button>
-      </div>
-      <div class="flex items-center gap-4">
-        <Select
-          class="w-24"
-          items={[
-            { value: "10", name: "10" },
-            { value: "25", name: "25" },
-            { value: "50", name: "50" },
-            { value: "100", name: "100" },
-          ]}
-          bind:value={itemsPerPage}
-        />
       </div>
     </div>
   {/if}

@@ -10,6 +10,7 @@ export interface VolTxnsResponse {
   qoq: number;
   txns: number;
   txns_yoy: number;
+  txns_qoq: number;
 }
 
 export interface YieldResponse {
