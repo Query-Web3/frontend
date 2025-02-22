@@ -21,6 +21,7 @@
   import { dev } from "$app/environment";
   import jsPDF from "jspdf";
   import autoTable from "jspdf-autotable";
+  import * as XLSX from "xlsx";
 
   let loading = $state(false);
   let fromDate = $state(dev ? "2024-10-18" : format(new Date(), "yyyy-MM-dd"));
@@ -167,7 +168,66 @@
   }
 
   async function exportToExcel() {
-    // Implementation for Excel export
+    // 准备表头
+    const headers = [
+      'Time',
+      'Volume ($)',
+      'Volume YoY',
+      'Volume QoQ',
+      'Txns',
+      'Txns YoY',
+      'Txns QoQ',
+    ];
+
+    // 准备数据
+    const excelData = data.map(item => [
+      format(new Date(item.time), "yyyy-MM-dd"),
+      formatNumber(item.volume).replace(/,/g, ''),  // 移除千分位分隔符
+      formatPercent(item.yoy).replace('%', ''),     // 移除百分号
+      formatPercent(item.qoq).replace('%', ''),
+      formatNumber(item.txns).replace(/,/g, ''),
+      formatPercent(item.txns_yoy).replace('%', ''),
+      formatPercent(item.txns_qoq).replace('%', ''),
+    ]);
+
+    // 创建工作表
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...excelData]);
+
+    // 设置列宽
+    const colWidths = [
+      { wch: 12 },  // Time
+      { wch: 15 },  // Volume
+      { wch: 12 },  // Volume YoY
+      { wch: 12 },  // Volume QoQ
+      { wch: 12 },  // Txns
+      { wch: 12 },  // Txns YoY
+      { wch: 12 },  // Txns QoQ
+    ];
+    ws['!cols'] = colWidths;
+
+    // 添加报表信息
+    const reportInfo = [
+      ['Volume & Transactions Report'],
+      [`Chain: ${selectedChain}, Cycle: ${selectedCycle}`],
+      [`From ${fromDate} to ${toDate}`],
+      [`Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`],
+      [],  // 空行
+    ];
+
+    // 创建新的工作表，包含报表信息
+    const finalWs = XLSX.utils.aoa_to_sheet(reportInfo);
+    XLSX.utils.sheet_add_aoa(finalWs, [headers, ...excelData], { origin: 'A6' });
+
+    // 设置标题样式
+    finalWs['A1'] = { t: 's', v: 'Volume & Transactions Report', s: { font: { bold: true, sz: 14 } } };
+
+    // 创建工作簿
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, finalWs, 'Report');
+
+    // 保存文件
+    const fileName = `vol-txns-report-${selectedChain}-${selectedCycle}-${format(new Date(), "yyyyMMdd")}.xlsx`;
+    XLSX.writeFile(wb, fileName);
   }
 </script>
 
