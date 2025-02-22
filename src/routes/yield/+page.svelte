@@ -36,7 +36,9 @@
   import { dev } from "$app/environment";
 
   let loading = $state(false);
-  let selectedDate = $state(dev ? "2024-12-08" : format(new Date(), "yyyy-MM-dd"));
+  let selectedDate = $state(
+    dev ? "2024-12-08" : format(new Date(), "yyyy-MM-dd"),
+  );
   let selectedChain = $state<Chain>("Hydration");
   let selectedAssetType = $state<AssetType>("DeFi");
   let selectedReturnType = $state<ReturnType>("Staking");
@@ -50,7 +52,7 @@
   let returnTypes = $state<SelectOptionType<ReturnType>[]>([]);
   let tokens = $state<SelectOptionType<string>[]>([]);
 
-  // 获取当前页面
+  // Get current page from URL parameters
   let currentPage = $derived(
     parseInt(page.url.searchParams.get("page") || "1"),
   );
@@ -126,7 +128,7 @@
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
     if (!selectedDate) {
-      alert("请选择日期");
+      alert("Please select a date");
       return;
     }
 
@@ -166,13 +168,13 @@
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     const margin = 14;
-    const usableWidth = pageWidth - (2 * margin);
+    const usableWidth = pageWidth - 2 * margin;
 
-    // 设置字体
+    // Set font
     doc.setFont("helvetica");
     doc.setFontSize(14);
 
-    // 添加标题和查询条件
+    // Add title and query conditions
     const title = [
       "Yield Query Report",
       `Date: ${selectedDate}`,
@@ -188,7 +190,7 @@
       yPos += 7;
     });
 
-    // 计算列宽
+    // Calculate column widths as percentages of usable width
     const colWidths = {
       0: usableWidth * 0.15, // Token
       1: usableWidth * 0.08, // APY
@@ -200,26 +202,28 @@
       7: usableWidth * 0.11, // Txns
     };
 
-    // 格式化数字
+    // Format numbers
     const formatNumber = (num: number | undefined | null): string => {
       if (num === undefined || num === null) return "0";
       return num.toLocaleString();
     };
 
-    // 生成表格
+    // Generate table
     autoTable(doc, {
       startY: yPos + 5,
       margin: { left: margin, right: margin },
-      head: [[
-        "Token",
-        "APY",
-        "TVL (USD)",
-        "Price (USD)",
-        "Chain",
-        "Return Type",
-        "24h Volume",
-        "24h Txns",
-      ]],
+      head: [
+        [
+          "Token",
+          "APY",
+          "TVL (USD)",
+          "Price (USD)",
+          "Chain",
+          "Return Type",
+          "24h Volume",
+          "24h Txns",
+        ],
+      ],
       body: data.map((row) => [
         row.token || "-",
         `${((row.apy || 0) * 100).toFixed(2)}%`,
@@ -255,7 +259,7 @@
       },
     });
 
-    // 添加页脚
+    // Add footer
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -264,30 +268,30 @@
         `Page ${i} of ${pageCount}`,
         pageWidth / 2,
         doc.internal.pageSize.height - 10,
-        { align: "center" }
+        { align: "center" },
       );
       doc.text(
         `Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`,
         margin,
-        doc.internal.pageSize.height - 10
+        doc.internal.pageSize.height - 10,
       );
     }
 
-    // 保存文件
+    // Save file
     doc.save(`yield-report-${selectedDate}.pdf`);
   }
 
   function exportToExcel() {
-    // 数字格式化函数
+    // Format numbers
     const formatNumber = (num: number | undefined | null): string => {
       if (num === undefined || num === null) return "0";
       return num.toLocaleString();
     };
 
-    // 创建工作簿
+    // Create workbook
     const wb = XLSX.utils.book_new();
 
-    // 添加标题和查询信息
+    // Add title and query info to worksheet
     const title = [
       "Yield Query Report",
       `Date: ${selectedDate}`,
@@ -297,7 +301,7 @@
       `Token: ${selectedToken || "All"}`,
     ];
 
-    // 表格表头
+    // Data headers
     const headers = [
       "Token",
       "APY",
@@ -309,10 +313,10 @@
       "24h Txns",
     ];
 
-    // 转换数据为工作表格式
+    // Convert data to worksheet format
     const wsData = [
-      ...title.map(line => [line]),
-      [""], // 标题后的空行
+      ...title.map((line) => [line]),
+      [""], // Empty row after title
       headers,
       ...data.map((row) => [
         row.token || "-",
@@ -324,40 +328,40 @@
         formatNumber(row.volume_24h_usd),
         formatNumber(row.transactions_24h),
       ]),
-      [""], // 页脚前的空行
+      [""], // Empty row before footer
       [`Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`],
     ];
 
-    // 创建工作表
+    // Create worksheet
     const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-    // 设置列宽
+    // Set column widths
     ws["!cols"] = [
-      { wch: 15 }, // Token 列
-      { wch: 10 }, // APY 列
-      { wch: 15 }, // TVL 列
-      { wch: 15 }, // Price 列
-      { wch: 15 }, // Chain 列
-      { wch: 15 }, // Return Type 列
-      { wch: 15 }, // Volume 列
-      { wch: 12 }, // Txns 列
+      { wch: 15 }, // Token
+      { wch: 10 }, // APY
+      { wch: 15 }, // TVL
+      { wch: 15 }, // Price
+      { wch: 15 }, // Chain
+      { wch: 15 }, // Return Type
+      { wch: 15 }, // Volume
+      { wch: 12 }, // Txns
     ];
 
-    // 设置单元格样式
+    // Style cells
     const range = XLSX.utils.decode_range(ws["!ref"] || "A1");
     for (let R = 0; R <= range.e.r; R++) {
       for (let C = 0; C <= range.e.c; C++) {
         const cell = XLSX.utils.encode_cell({ r: R, c: C });
         if (!ws[cell]) continue;
 
-        // 初始化样式对象
+        // Initialize style if not exists
         if (!ws[cell].s) ws[cell].s = {};
 
-        // 标题样式
+        // Title styles
         if (R < title.length) {
           ws[cell].s.font = { bold: true, sz: 14 };
         }
-        // 表头样式
+        // Header styles
         else if (R === title.length + 1) {
           ws[cell].s = {
             font: { bold: true, color: { rgb: "FFFFFF" } },
@@ -365,7 +369,7 @@
             alignment: { horizontal: "center" },
           };
         }
-        // 数据行样式
+        // Data styles
         else if (R > title.length + 1 && R < range.e.r) {
           ws[cell].s.alignment = {
             horizontal: [0, 4, 5].includes(C) ? "left" : "right",
@@ -374,10 +378,10 @@
       }
     }
 
-    // 将工作表添加到工作簿
+    // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, "Yield Data");
 
-    // 保存文件
+    // Save file
     XLSX.writeFile(wb, `yield-report-${selectedDate}.xlsx`);
   }
 </script>
@@ -388,11 +392,11 @@
       <div class="grid grid-cols-2 gap-4">
         <!-- 第一行 -->
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">日期</Label>
+          <Label class="w-20 whitespace-nowrap">date</Label>
           <input type="date" class="w-full" bind:value={selectedDate} />
         </div>
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">链</Label>
+          <Label class="w-20 whitespace-nowrap">chain</Label>
           <Select class="w-full" items={chains} bind:value={selectedChain} />
         </div>
       </div>
@@ -400,7 +404,7 @@
       <div class="grid grid-cols-2 gap-4">
         <!-- 第二行 -->
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">资产类型</Label>
+          <Label class="w-20 whitespace-nowrap">asset type</Label>
           <Select
             class="w-full"
             items={assetTypes}
@@ -408,7 +412,7 @@
           />
         </div>
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">代币</Label>
+          <Label class="w-20 whitespace-nowrap">token</Label>
           <Select class="w-full" items={tokens} bind:value={selectedToken} />
         </div>
       </div>
@@ -416,7 +420,7 @@
       <div class="grid grid-cols-2 gap-4">
         <!-- 第三行 -->
         <div class="flex items-center gap-4">
-          <Label class="w-20 whitespace-nowrap">收益类型</Label>
+          <Label class="w-20 whitespace-nowrap">return type</Label>
           <Select
             class="w-full"
             items={returnTypes}
@@ -426,7 +430,7 @@
       </div>
 
       <div class="flex justify-center w-full mt-4">
-        <Button type="submit">查询</Button>
+        <Button type="submit">Query</Button>
       </div>
     </form>
   </Card>
@@ -435,14 +439,14 @@
     <Card class="mb-3" size="none">
       <Table shadow>
         <TableHead>
-          <TableHeadCell>代币</TableHeadCell>
+          <TableHeadCell>Token</TableHeadCell>
           <TableHeadCell>APY</TableHeadCell>
           <TableHeadCell>TVL (USD)</TableHeadCell>
-          <TableHeadCell>价格 (USD)</TableHeadCell>
-          <TableHeadCell>链</TableHeadCell>
-          <TableHeadCell>收益类型</TableHeadCell>
-          <TableHeadCell>24小时交易量 (USD)</TableHeadCell>
-          <TableHeadCell>24小时交易次数</TableHeadCell>
+          <TableHeadCell>Price (USD)</TableHeadCell>
+          <TableHeadCell>Chain</TableHeadCell>
+          <TableHeadCell>Return Type</TableHeadCell>
+          <TableHeadCell>24h Volume (USD)</TableHeadCell>
+          <TableHeadCell>24h Transactions</TableHeadCell>
         </TableHead>
         <TableBody>
           {#if data && data.length > 0}
@@ -470,7 +474,7 @@
           {:else}
             <TableBodyRow>
               <TableBodyCell colspan="8" class="text-center"
-                >无数据</TableBodyCell
+                >No data available</TableBodyCell
               >
             </TableBodyRow>
           {/if}
@@ -481,11 +485,11 @@
         <div class="flex items-center gap-4">
           <Button color="light" on:click={exportToPDF}>
             <IconFileTypePdf class="w-5 h-5 mr-2" />
-            导出 PDF
+            Export PDF
           </Button>
           <Button color="light" on:click={exportToExcel}>
             <IconFileTypeXls class="w-5 h-5 mr-2" />
-            导出 Excel
+            Export Excel
           </Button>
         </div>
         <div class="flex items-center gap-4">
