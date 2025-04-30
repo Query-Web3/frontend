@@ -34,7 +34,7 @@ export interface VolTxnsQuery {
   cycle: string;
 }
 
-export type Chain = "Hydration" | "Polkadot" | "Kusama" | "Bifrost";
+export type Chain = "Bifrost" | "Hydration" | "stellaswap" | "acala";
 export type AssetType = "DeFi" | "Lending" | "Staking";
 export type ReturnType = "Staking" | "Farming" | "Lending";
 

@@ -26,7 +26,7 @@
   let loading = $state(false);
   let fromDate = $state(dev ? "2024-10-18" : format(new Date(), "yyyy-MM-dd"));
   let toDate = $state(dev ? "2025-01-26" : format(new Date(), "yyyy-MM-dd"));
-  let selectedChain = $state(dev ? "Hydration" : "Polkadot");
+  let selectedChain = $state(dev ? "Hydration" : "Bifrost");
   let selectedCycle = $state("daily");
   let data = $state<VolTxnsResponse[]>([]);
   let totalPages = $state(1);
