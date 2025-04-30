@@ -13,7 +13,7 @@
     Pagination,
     type SelectOptionType,
   } from "flowbite-svelte";
-  import api, { type VolTxnsQuery, type VolTxnsResponse } from "$lib/api";
+  import api, { CHAINS, type VolTxnsQuery, type VolTxnsResponse } from "$lib/api";
   import { format } from "date-fns";
   import { onMount } from "svelte";
   import { select_option } from "$lib/utils";
@@ -33,7 +33,7 @@
   let totalItems = $state(0);
 
   // 选项数据
-  const chains = select_option(["Polkadot", "Kusama", "Hydration", "Bifrost"]);
+  const chains = select_option([...CHAINS]);
   const cycles = select_option(["daily", "weekly", "monthly", "yearly"]);
 
   // 分页状态
