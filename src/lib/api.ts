@@ -62,7 +62,7 @@ export interface PageResponse<T> {
 }
 
 // 预定义常量
-export const CHAINS = ["Hydration", "Polkadot", "Kusama", "Bifrost"] as const;
+export const CHAINS = ["Bifrost", "Hydration", "stellaswap", "acala"] as const;
 export const ASSET_TYPES = ["DeFi", "Lending", "Staking"] as const;
 export const RETURN_TYPES = ["Staking", "Farming", "Lending"] as const;
 
