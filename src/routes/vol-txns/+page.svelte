@@ -282,6 +282,7 @@
       <Table striped={true}>
         <TableHead>
           <TableHeadCell>Time</TableHeadCell>
+          <TableHeadCell>TOKEN</TableHeadCell>
           <TableHeadCell>Volume ($)</TableHeadCell>
           <TableHeadCell>Volume YoY</TableHeadCell>
           <TableHeadCell>Volume QoQ</TableHeadCell>
@@ -293,6 +294,7 @@
           {#each data as item}
             <TableBodyRow>
               <TableBodyCell>{format(new Date(item.time), "yyyy-MM-dd")}</TableBodyCell>
+              <TableBodyCell>{item.token || "-"}</TableBodyCell>
               <TableBodyCell>{formatNumber(item.volume)}</TableBodyCell>
               <TableBodyCell class={isPositive(item.yoy) ? "text-green-600" : "text-red-600"}>
                 {formatPercent(item.yoy)}

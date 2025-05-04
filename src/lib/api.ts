@@ -11,6 +11,7 @@ export interface VolTxnsResponse {
   txns: number;
   txns_yoy: number;
   txns_qoq: number;
+  token?: string; // 添加token字段
 }
 
 export interface YieldResponse {
