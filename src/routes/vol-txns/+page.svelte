@@ -13,7 +13,6 @@
     Pagination,
     type SelectOptionType,
   } from "flowbite-svelte";
-  import api, { CHAINS, type VolTxnsQuery, type VolTxnsResponse } from "$lib/api";
   import { format } from "date-fns";
   import { onMount } from "svelte";
   import { select_option } from "$lib/utils";
@@ -22,32 +21,56 @@
   import jsPDF from "jspdf";
   import autoTable from "jspdf-autotable";
   import * as XLSX from "xlsx";
+  import { clientApi, type ApiPaths } from "$lib/api";
+
+  type VolTxnsResponse = NonNullable<
+    ApiPaths["/api/v1/vol-txns"]["post"]["responses"]["200"]["content"]["application/json"]["data"]
+  >;
+  type VolTxnsQuery = NonNullable<
+    ApiPaths["/api/v1/vol-txns"]["post"]["requestBody"]
+  >["content"]["application/json"];
 
   let loading = $state(false);
-  let fromDate = $state(dev ? "2024-10-18" : format(new Date(), "yyyy-MM-dd"));
-  let toDate = $state(dev ? "2025-01-26" : format(new Date(), "yyyy-MM-dd"));
+  let fromDate = $state(format(new Date(), "yyyy-MM-dd"));
+  let toDate = $state(format(new Date(), "yyyy-MM-dd"));
   let selectedChain = $state(dev ? "Hydration" : "Bifrost");
   let selectedCycle = $state("daily");
-  let data = $state<VolTxnsResponse[]>([]);
+  let data = $state<VolTxnsResponse>([]);
   let totalPages = $state(1);
   let totalItems = $state(0);
 
   // 选项数据
-  const chains = select_option([...CHAINS]);
-  const cycles = select_option(["daily", "weekly", "monthly", "yearly"]);
+  let chains = $state<SelectOptionType<string>[]>([]);
+  let cycles = $state<SelectOptionType<string>[]>([]);
 
   // 分页状态
   let currentPage = $state(1);
   let itemsPerPage = $state(10);
 
-  onMount(() => {
+  onMount(async () => {
+    await getChainsOptions();
+    await getCyclesOptions();
     handleSubmit();
   });
+
+  async function getChainsOptions() {
+    const { data } = await clientApi.GET("/api/v1/chains");
+    if (data) {
+      chains = select_option(data);
+    }
+  }
+
+  async function getCyclesOptions() {
+    const { data } = await clientApi.GET("/api/v1/cycles");
+    if (data) {
+      cycles = select_option(data);
+    }
+  }
 
   // 格式化数字
   const formatNumber = (num: number | undefined | null | string): string => {
     if (num === undefined || num === null) return "-";
-    const value = typeof num === 'string' ? parseFloat(num) : num;
+    const value = typeof num === "string" ? parseFloat(num) : num;
     if (isNaN(value)) return "-";
     return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
   };
@@ -55,7 +78,7 @@
   // 格式化百分比
   const formatPercent = (num: number | undefined | null | string): string => {
     if (num === undefined || num === null) return "-";
-    const value = typeof num === 'string' ? parseFloat(num) : num;
+    const value = typeof num === "string" ? parseFloat(num) : num;
     if (isNaN(value)) return "-";
     return `${value.toFixed(2)}%`;
   };
@@ -63,7 +86,7 @@
   // 检查是否为正数
   const isPositive = (num: number | undefined | null | string): boolean => {
     if (num === undefined || num === null) return false;
-    const value = typeof num === 'string' ? parseFloat(num) : num;
+    const value = typeof num === "string" ? parseFloat(num) : num;
     return !isNaN(value) && value >= 0;
   };
 
@@ -84,13 +107,24 @@
 
     try {
       loading = true;
-      const response = await api.getVolTxns(query);
-      console.log('Response:', response);
+      const response = (
+        await clientApi.POST("/api/v1/vol-txns", {
+          body: query,
+        })
+      ).data;
+
+      if (!response) {
+        alert("No data found");
+        return;
+      }
+
+      console.log("Response:", response);
+
       data = response.data || [];
       // 更新分页信息
-      currentPage = response.current_page || 1;
-      totalPages = response.total_pages || 1;
-      totalItems = response.total_items || 0;
+      currentPage = response.total || 1;
+      // totalPages = response.total_pages || 1;
+      // totalItems = response.total_items || 0;
     } catch (error) {
       console.error(error);
       alert("Failed to fetch data");
@@ -111,7 +145,7 @@
     // 添加标题
     doc.setFontSize(16);
     doc.text(title, 14, 20);
-    
+
     // 添加子标题
     doc.setFontSize(11);
     doc.text(subtitle, 14, 30);
@@ -119,7 +153,7 @@
     doc.text(exportTime, 14, 40);
 
     // 准备表格数据
-    const tableRows = data.map(item => [
+    const tableRows = data.map((item) => [
       format(new Date(item.time), "yyyy-MM-dd"),
       formatNumber(item.volume),
       formatPercent(item.yoy),
@@ -131,18 +165,20 @@
 
     // 添加表格
     autoTable(doc, {
-      head: [[
-        'Time',
-        'Volume ($)',
-        'Volume YoY',
-        'Volume QoQ',
-        'Txns',
-        'Txns YoY',
-        'Txns QoQ',
-      ]],
+      head: [
+        [
+          "Time",
+          "Volume ($)",
+          "Volume YoY",
+          "Volume QoQ",
+          "Txns",
+          "Txns YoY",
+          "Txns QoQ",
+        ],
+      ],
       body: tableRows,
       startY: 45,
-      theme: 'striped',
+      theme: "striped",
       headStyles: {
         fillColor: [66, 139, 202],
         textColor: 255,
@@ -170,24 +206,24 @@
   async function exportToExcel() {
     // 准备表头
     const headers = [
-      'Time',
-      'Volume ($)',
-      'Volume YoY',
-      'Volume QoQ',
-      'Txns',
-      'Txns YoY',
-      'Txns QoQ',
+      "Time",
+      "Volume ($)",
+      "Volume YoY",
+      "Volume QoQ",
+      "Txns",
+      "Txns YoY",
+      "Txns QoQ",
     ];
 
     // 准备数据
-    const excelData = data.map(item => [
+    const excelData = data.map((item) => [
       format(new Date(item.time), "yyyy-MM-dd"),
-      formatNumber(item.volume).replace(/,/g, ''),  // 移除千分位分隔符
-      formatPercent(item.yoy).replace('%', ''),     // 移除百分号
-      formatPercent(item.qoq).replace('%', ''),
-      formatNumber(item.txns).replace(/,/g, ''),
-      formatPercent(item.txns_yoy).replace('%', ''),
-      formatPercent(item.txns_qoq).replace('%', ''),
+      formatNumber(item.volume).replace(/,/g, ""), // 移除千分位分隔符
+      formatPercent(item.yoy).replace("%", ""), // 移除百分号
+      formatPercent(item.qoq).replace("%", ""),
+      formatNumber(item.txns).replace(/,/g, ""),
+      formatPercent(item.txns_yoy).replace("%", ""),
+      formatPercent(item.txns_qoq).replace("%", ""),
     ]);
 
     // 创建工作表
@@ -195,35 +231,41 @@
 
     // 设置列宽
     const colWidths = [
-      { wch: 12 },  // Time
-      { wch: 15 },  // Volume
-      { wch: 12 },  // Volume YoY
-      { wch: 12 },  // Volume QoQ
-      { wch: 12 },  // Txns
-      { wch: 12 },  // Txns YoY
-      { wch: 12 },  // Txns QoQ
+      { wch: 12 }, // Time
+      { wch: 15 }, // Volume
+      { wch: 12 }, // Volume YoY
+      { wch: 12 }, // Volume QoQ
+      { wch: 12 }, // Txns
+      { wch: 12 }, // Txns YoY
+      { wch: 12 }, // Txns QoQ
     ];
-    ws['!cols'] = colWidths;
+    ws["!cols"] = colWidths;
 
     // 添加报表信息
     const reportInfo = [
-      ['Volume & Transactions Report'],
+      ["Volume & Transactions Report"],
       [`Chain: ${selectedChain}, Cycle: ${selectedCycle}`],
       [`From ${fromDate} to ${toDate}`],
       [`Export Time: ${format(new Date(), "yyyy-MM-dd HH:mm:ss")}`],
-      [],  // 空行
+      [], // 空行
     ];
 
     // 创建新的工作表，包含报表信息
     const finalWs = XLSX.utils.aoa_to_sheet(reportInfo);
-    XLSX.utils.sheet_add_aoa(finalWs, [headers, ...excelData], { origin: 'A6' });
+    XLSX.utils.sheet_add_aoa(finalWs, [headers, ...excelData], {
+      origin: "A6",
+    });
 
     // 设置标题样式
-    finalWs['A1'] = { t: 's', v: 'Volume & Transactions Report', s: { font: { bold: true, sz: 14 } } };
+    finalWs["A1"] = {
+      t: "s",
+      v: "Volume & Transactions Report",
+      s: { font: { bold: true, sz: 14 } },
+    };
 
     // 创建工作簿
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, finalWs, 'Report');
+    XLSX.utils.book_append_sheet(wb, finalWs, "Report");
 
     // 保存文件
     const fileName = `vol-txns-report-${selectedChain}-${selectedCycle}-${format(new Date(), "yyyyMMdd")}.xlsx`;
@@ -293,20 +335,34 @@
         <TableBody>
           {#each data as item}
             <TableBodyRow>
-              <TableBodyCell>{format(new Date(item.time), "yyyy-MM-dd")}</TableBodyCell>
+              <TableBodyCell
+                >{format(new Date(item.time), "yyyy-MM-dd")}</TableBodyCell
+              >
               <TableBodyCell>{item.token || "-"}</TableBodyCell>
               <TableBodyCell>{formatNumber(item.volume)}</TableBodyCell>
-              <TableBodyCell class={isPositive(item.yoy) ? "text-green-600" : "text-red-600"}>
+              <TableBodyCell
+                class={isPositive(item.yoy) ? "text-green-600" : "text-red-600"}
+              >
                 {formatPercent(item.yoy)}
               </TableBodyCell>
-              <TableBodyCell class={isPositive(item.qoq) ? "text-green-600" : "text-red-600"}>
+              <TableBodyCell
+                class={isPositive(item.qoq) ? "text-green-600" : "text-red-600"}
+              >
                 {formatPercent(item.qoq)}
               </TableBodyCell>
               <TableBodyCell>{formatNumber(item.txns)}</TableBodyCell>
-              <TableBodyCell class={isPositive(item.txns_yoy) ? "text-green-600" : "text-red-600"}>
+              <TableBodyCell
+                class={isPositive(item.txns_yoy)
+                  ? "text-green-600"
+                  : "text-red-600"}
+              >
                 {formatPercent(item.txns_yoy)}
               </TableBodyCell>
-              <TableBodyCell class={isPositive(item.txns_qoq) ? "text-green-600" : "text-red-600"}>
+              <TableBodyCell
+                class={isPositive(item.txns_qoq)
+                  ? "text-green-600"
+                  : "text-red-600"}
+              >
                 {formatPercent(item.txns_qoq)}
               </TableBodyCell>
             </TableBodyRow>

@@ -12,17 +12,6 @@
     Card,
     type SelectOptionType,
   } from "flowbite-svelte";
-  import api, {
-    CHAINS,
-    ASSET_TYPES,
-    RETURN_TYPES,
-    type Chain,
-    type AssetType,
-    type ReturnType,
-    type YieldQuery,
-    type YieldResponse,
-    type PageResponse,
-  } from "$lib/api";
   import { format } from "date-fns";
   import { select_option } from "$lib/utils";
   import { onMount } from "svelte";
@@ -33,23 +22,21 @@
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import CustomPagination from "$lib/components/CustomPagination.svelte";
-  import { dev } from "$app/environment";
+  import { clientApi, type ApiPaths, type ApiSchema } from "$lib/api";
 
   let loading = $state(false);
-  let selectedDate = $state(
-    dev ? "2024-12-08" : format(new Date(), "yyyy-MM-dd"),
-  );
-  let selectedChain = $state<Chain>("Hydration");
-  let selectedAssetType = $state<AssetType>("DeFi");
-  let selectedReturnType = $state<ReturnType>("Staking");
-  let selectedToken = $state("TKN1");
-  let totalPages = $state(1000);
+  let selectedDate = $state(format(new Date(), "yyyy-MM-dd"));
+  let selectedChain = $state<string>();
+  let selectedAssetType = $state<string>();
+  let selectedReturnType = $state<string>();
+  let selectedToken = $state<string>();
+  let totalPages = $state(500);
   let itemsPerPage = $state(10);
 
   // 选项数据
-  let chains = $state<SelectOptionType<Chain>[]>([]);
-  let assetTypes = $state<SelectOptionType<AssetType>[]>([]);
-  let returnTypes = $state<SelectOptionType<ReturnType>[]>([]);
+  let chains = $state<SelectOptionType<string>[]>([]);
+  let assetTypes = $state<SelectOptionType<string>[]>([]);
+  let returnTypes = $state<SelectOptionType<string>[]>([]);
   let tokens = $state<SelectOptionType<string>[]>([]);
 
   // Get current page from URL parameters
@@ -57,30 +44,41 @@
     parseInt(page.url.searchParams.get("page") || "1"),
   );
 
-  let data = $state<YieldResponse[]>([]);
+  type YieldResponse =
+    ApiPaths["/api/v1/yield"]["post"]["responses"]["200"]["content"]["application/json"]["data"];
+
+  type YieldQuery = NonNullable<
+    ApiPaths["/api/v1/yield"]["post"]["requestBody"]
+  >["content"]["application/json"];
+
+  let data = $state<YieldResponse>([]);
 
   // 加载选项数据
   async function loadOptions() {
     try {
       const [chainsData, assetTypesData, returnTypesData, tokensData] =
         await Promise.all([
-          api.getChains(),
-          api.getAssetTypes(),
-          api.getReturnTypes(),
-          api.getTokens(),
+          clientApi.GET("/api/v1/chains"),
+          clientApi.GET("/api/v1/asset-types"),
+          clientApi.GET("/api/v1/return-types"),
+          clientApi.GET("/api/v1/tokens"),
         ]);
 
-      chains = select_option(chainsData);
-      assetTypes = select_option(assetTypesData);
-      returnTypes = select_option([...returnTypesData] as ReturnType[]); // 添加空选项
-      tokens = select_option([...tokensData]); // 添加空选项
+      chains = select_option(chainsData.data ?? []);
+      assetTypes = select_option(assetTypesData.data ?? []);
+      returnTypes = select_option(returnTypesData.data ?? []); // 添加空选项
+      tokens = select_option(tokensData.data ?? []); // 添加空选项
 
       // 如果当前选择的值不在选项中，重置为第一个选项
-      if (!chainsData.includes(selectedChain)) {
-        selectedChain = chainsData[0];
+      if (!selectedChain && chainsData.data && chainsData.data.length > 0) {
+        selectedChain = chainsData.data[0];
       }
-      if (!assetTypesData.includes(selectedAssetType)) {
-        selectedAssetType = assetTypesData[0];
+      if (
+        !selectedAssetType &&
+        assetTypesData.data &&
+        assetTypesData.data.length > 0
+      ) {
+        selectedAssetType = assetTypesData.data[0];
       }
     } catch (error) {
       console.error("Failed to load options:", error);
@@ -91,10 +89,16 @@
   // 当选择链或资产类型变化时，重新加载代币列表
   async function updateTokensList() {
     try {
-      const tokensData = await api.getTokens({
-        chain: selectedChain,
-        asset_type: selectedAssetType,
-      });
+      const tokensData = (
+        await clientApi.GET("/api/v1/tokens", {
+          params: {
+            query: {
+              chain_id: selectedChain,
+              asset_type: selectedAssetType,
+            },
+          },
+        })
+      ).data;
 
       // 确保 tokensData 是数组
       if (Array.isArray(tokensData)) {
@@ -132,22 +136,38 @@
       return;
     }
 
+    if (!selectedChain) {
+      alert("Please select a chain");
+      return;
+    }
+
+    if (!selectedAssetType) {
+      alert("Please select an asset type");
+      return;
+    }
+
     const query: YieldQuery = {
       date: selectedDate,
       chain: selectedChain,
       asset_type: selectedAssetType,
-      return_type: selectedReturnType || undefined,
-      token: selectedToken || undefined,
+      return_type: selectedReturnType,
+      token: selectedToken,
       page: currentPage,
       page_size: itemsPerPage,
     };
 
     try {
       loading = true;
-      const response = await api.getYield(query);
+      console.log("API Query:", query); // 添加日志
+
+      const response = await clientApi.POST("/api/v1/yield", {
+        body: query,
+      });
+
       console.log("API Response:", response); // 添加日志
-      data = response.data || [];
-      totalPages = response.total_pages || 1;
+      data = response.data?.data ?? [];
+
+      totalPages = response.data?.total_pages ?? 1;
     } catch (error) {
       console.error(error);
       alert("Failed to fetch data");
@@ -203,7 +223,7 @@
     };
 
     // Format numbers
-    const formatNumber = (num: number | undefined | null): string => {
+    const formatNumber = (num: number | string | undefined | null): string => {
       if (num === undefined || num === null) return "0";
       return num.toLocaleString();
     };
@@ -226,7 +246,7 @@
       ],
       body: data.map((row) => [
         row.token || "-",
-        `${((row.apy || 0) * 100).toFixed(2)}%`,
+        `${(Number(row.apy ?? "0") * 100).toFixed(2)}%`,
         formatNumber(row.tvl_usd),
         formatNumber(row.price_usd),
         row.chain || "-",
@@ -283,7 +303,7 @@
 
   function exportToExcel() {
     // Format numbers
-    const formatNumber = (num: number | undefined | null): string => {
+    const formatNumber = (num: number | string | undefined | null): string => {
       if (num === undefined || num === null) return "0";
       return num.toLocaleString();
     };
@@ -320,7 +340,7 @@
       headers,
       ...data.map((row) => [
         row.token || "-",
-        `${((row.apy || 0) * 100).toFixed(2)}%`,
+        `${((Number(row.apy) || 0) * 100).toFixed(2)}%`,
         formatNumber(row.tvl_usd),
         formatNumber(row.price_usd),
         row.chain || "-",
@@ -453,7 +473,9 @@
             {#each data as row}
               <TableBodyRow>
                 <TableBodyCell>{row.token}</TableBodyCell>
-                <TableBodyCell>{(row.apy * 100).toFixed(2)}%</TableBodyCell>
+                <TableBodyCell
+                  >{(Number(row.apy) * 100).toFixed(2)}%</TableBodyCell
+                >
                 <TableBodyCell
                   >{row.tvl_usd?.toLocaleString() || "0"}</TableBodyCell
                 >

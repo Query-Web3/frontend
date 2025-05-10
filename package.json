@@ -8,7 +8,8 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"openapi": "npx openapi-typescript $OPENAPI_PATH -o ./src/lib/api/api.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -16,6 +17,7 @@
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
 		"autoprefixer": "^10.4.14",
+		"openapi-typescript": "^7.7.1",
 		"postcss": "^8.4.24",
 		"svelte": "^5.0.0",
 		"svelte-check": "^3.6.0",
@@ -33,6 +35,7 @@
 		"http-api": "https://github.com/iyangdianfeng/http-api.git",
 		"jspdf": "^2.5.2",
 		"jspdf-autotable": "^3.8.4",
+		"openapi-fetch": "^0.13.7",
 		"xlsx": "^0.18.5",
 		"zod": "3.24.1"
 	},
