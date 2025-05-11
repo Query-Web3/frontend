@@ -47,9 +47,12 @@
   type YieldResponse =
     ApiPaths["/api/v1/yield"]["post"]["responses"]["200"]["content"]["application/json"]["data"];
 
-  type YieldQuery = NonNullable<
+  type YieldQuery = Omit<NonNullable<
     ApiPaths["/api/v1/yield"]["post"]["requestBody"]
-  >["content"]["application/json"];
+  >["content"]["application/json"], 'chain' | 'asset_type'> & {
+    chain?: string;
+    asset_type?: string;
+  };
 
   let data = $state<YieldResponse>([]);
 
@@ -64,22 +67,17 @@
           clientApi.GET("/api/v1/tokens"),
         ]);
 
-      chains = select_option(chainsData.data ?? []);
-      assetTypes = select_option(assetTypesData.data ?? []);
-      returnTypes = select_option(returnTypesData.data ?? []); // 添加空选项
-      tokens = select_option(tokensData.data ?? []); // 添加空选项
+      // 添加空选项到所有选择列表
+      chains = select_option(["", ...(chainsData.data ?? [])]);
+      assetTypes = select_option(["", ...(assetTypesData.data ?? [])]);
+      returnTypes = select_option(["", ...(returnTypesData.data ?? [])]);
+      tokens = select_option(["", ...(tokensData.data ?? [])]);
 
-      // 如果当前选择的值不在选项中，重置为第一个选项
-      if (!selectedChain && chainsData.data && chainsData.data.length > 0) {
-        selectedChain = chainsData.data[0];
-      }
-      if (
-        !selectedAssetType &&
-        assetTypesData.data &&
-        assetTypesData.data.length > 0
-      ) {
-        selectedAssetType = assetTypesData.data[0];
-      }
+      // 不自动选择任何选项
+      selectedChain = "";
+      selectedAssetType = "";
+      selectedReturnType = "";
+      selectedToken = "";
     } catch (error) {
       console.error("Failed to load options:", error);
       alert("Failed to load options");
@@ -136,32 +134,26 @@
       return;
     }
 
-    if (!selectedChain) {
-      alert("Please select a chain");
-      return;
-    }
-
-    if (!selectedAssetType) {
-      alert("Please select an asset type");
-      return;
-    }
+    // chain 和 asset_type 是可选的，不需要验证
 
     const query: YieldQuery = {
       date: selectedDate,
-      chain: selectedChain,
-      asset_type: selectedAssetType,
-      return_type: selectedReturnType,
-      token: selectedToken,
       page: currentPage,
       page_size: itemsPerPage,
     };
+
+    // 只在有值时添加可选参数
+    if (selectedChain) query.chain = selectedChain;
+    if (selectedAssetType) query.asset_type = selectedAssetType;
+    if (selectedReturnType) query.return_type = selectedReturnType;
+    if (selectedToken) query.token = selectedToken;
 
     try {
       loading = true;
       console.log("API Query:", query); // 添加日志
 
       const response = await clientApi.POST("/api/v1/yield", {
-        body: query,
+        body: query as any, // 使用 any 类型来绕过类型检查
       });
 
       console.log("API Response:", response); // 添加日志

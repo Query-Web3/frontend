@@ -33,7 +33,7 @@
   let loading = $state(false);
   let fromDate = $state(format(new Date(), "yyyy-MM-dd"));
   let toDate = $state(format(new Date(), "yyyy-MM-dd"));
-  let selectedChain = $state(dev ? "Hydration" : "Bifrost");
+  let selectedChain = $state("");
   let selectedCycle = $state("daily");
   let data = $state<VolTxnsResponse>([]);
   let totalPages = $state(1);
@@ -56,14 +56,14 @@
   async function getChainsOptions() {
     const { data } = await clientApi.GET("/api/v1/chains");
     if (data) {
-      chains = select_option(data);
+      chains = select_option(["", ...data]);
     }
   }
 
   async function getCyclesOptions() {
     const { data } = await clientApi.GET("/api/v1/cycles");
     if (data) {
-      cycles = select_option(data);
+      cycles = select_option(["", ...data]);
     }
   }
 
@@ -118,9 +118,12 @@
         return;
       }
 
-      console.log("Response:", response);
+      console.log("Response data:", response);
+      console.log("Response data type:", typeof response);
+      console.log("Response data.data:", response.data);
 
       data = response.data || [];
+      console.log("Assigned data:", data);
       // 更新分页信息
       currentPage = response.total || 1;
       // totalPages = response.total_pages || 1;
@@ -324,6 +327,7 @@
       <Table striped={true}>
         <TableHead>
           <TableHeadCell>Time</TableHeadCell>
+          <TableHeadCell>Chain</TableHeadCell>
           <TableHeadCell>TOKEN</TableHeadCell>
           <TableHeadCell>Volume ($)</TableHeadCell>
           <TableHeadCell>Volume YoY</TableHeadCell>
@@ -338,6 +342,7 @@
               <TableBodyCell
                 >{format(new Date(item.time), "yyyy-MM-dd")}</TableBodyCell
               >
+              <TableBodyCell>{item.chain || "-"}</TableBodyCell>
               <TableBodyCell>{item.token || "-"}</TableBodyCell>
               <TableBodyCell>{formatNumber(item.volume)}</TableBodyCell>
               <TableBodyCell

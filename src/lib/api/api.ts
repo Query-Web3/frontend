@@ -49,6 +49,7 @@ export interface paths {
                                 txns_yoy?: string | null;
                                 txns_qoq?: string | null;
                                 token: string;
+                                chain: string;
                             }[];
                             total: number;
                         };
