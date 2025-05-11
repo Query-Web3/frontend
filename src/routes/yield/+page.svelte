@@ -23,6 +23,7 @@
   import { goto } from "$app/navigation";
   import CustomPagination from "$lib/components/CustomPagination.svelte";
   import { clientApi, type ApiPaths, type ApiSchema } from "$lib/api";
+  import message from "$lib/components/message";
 
   let loading = $state(false);
   let selectedDate = $state(format(new Date(), "yyyy-MM-dd"));
@@ -47,9 +48,12 @@
   type YieldResponse =
     ApiPaths["/api/v1/yield"]["post"]["responses"]["200"]["content"]["application/json"]["data"];
 
-  type YieldQuery = Omit<NonNullable<
-    ApiPaths["/api/v1/yield"]["post"]["requestBody"]
-  >["content"]["application/json"], 'chain' | 'asset_type'> & {
+  type YieldQuery = Omit<
+    NonNullable<
+      ApiPaths["/api/v1/yield"]["post"]["requestBody"]
+    >["content"]["application/json"],
+    "chain" | "asset_type"
+  > & {
     chain?: string;
     asset_type?: string;
   };
@@ -80,7 +84,7 @@
       selectedToken = "";
     } catch (error) {
       console.error("Failed to load options:", error);
-      alert("Failed to load options");
+      message.error("Failed to load options");
     }
   }
 
@@ -130,7 +134,7 @@
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
     if (!selectedDate) {
-      alert("Please select a date");
+      message.error("Please select a date");
       return;
     }
 
@@ -162,7 +166,7 @@
       totalPages = response.data?.total_pages ?? 1;
     } catch (error) {
       console.error(error);
-      alert("Failed to fetch data");
+      message.error("Failed to fetch data");
       data = [];
       totalPages = 1;
     } finally {

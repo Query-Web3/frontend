@@ -8,6 +8,7 @@
     NavHamburger,
   } from "flowbite-svelte";
   import "../app.css";
+  import message from "$lib/components/message";
 
   const { children } = $props();
 </script>

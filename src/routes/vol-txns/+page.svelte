@@ -17,11 +17,11 @@
   import { onMount } from "svelte";
   import { select_option } from "$lib/utils";
   import { IconFileTypePdf, IconFileTypeXls } from "@tabler/icons-svelte";
-  import { dev } from "$app/environment";
   import jsPDF from "jspdf";
   import autoTable from "jspdf-autotable";
   import * as XLSX from "xlsx";
   import { clientApi, type ApiPaths } from "$lib/api";
+  import message from "$lib/components/message";
 
   type VolTxnsResponse = NonNullable<
     ApiPaths["/api/v1/vol-txns"]["post"]["responses"]["200"]["content"]["application/json"]["data"]
@@ -94,7 +94,7 @@
     e?.preventDefault();
 
     if (!fromDate || !toDate) {
-      alert("Please select dates");
+      message.error("Please select dates");
       return;
     }
 
@@ -114,7 +114,7 @@
       ).data;
 
       if (!response) {
-        alert("No data found");
+        message.error("No data found");
         return;
       }
 
@@ -130,7 +130,7 @@
       // totalItems = response.total_items || 0;
     } catch (error) {
       console.error(error);
-      alert("Failed to fetch data");
+      message.error("Failed to fetch data");
       data = [];
     } finally {
       loading = false;
