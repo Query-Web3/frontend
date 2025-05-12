@@ -48,15 +48,9 @@
   type YieldResponse =
     ApiPaths["/api/v1/yield"]["post"]["responses"]["200"]["content"]["application/json"]["data"];
 
-  type YieldQuery = Omit<
-    NonNullable<
-      ApiPaths["/api/v1/yield"]["post"]["requestBody"]
-    >["content"]["application/json"],
-    "chain" | "asset_type"
-  > & {
-    chain?: string;
-    asset_type?: string;
-  };
+  type YieldQuery = NonNullable<
+    ApiPaths["/api/v1/yield"]["post"]["requestBody"]
+  >["content"]["application/json"];
 
   let data = $state<YieldResponse>([]);
 
@@ -133,7 +127,7 @@
 
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
-    
+
     // 如果是表单提交(点击查询按钮)，则重置分页到第一页
     if (e) {
       await goto(`?page=1`, { keepFocus: true });
@@ -148,6 +142,8 @@
 
     const query: YieldQuery = {
       date: selectedDate,
+      chain: selectedChain,
+      asset_type: selectedAssetType,
       page: currentPage,
       page_size: itemsPerPage,
     };
@@ -163,7 +159,7 @@
       console.log("API Query:", query); // 添加日志
 
       const response = await clientApi.POST("/api/v1/yield", {
-        body: query as any, // 使用 any 类型来绕过类型检查
+        body: query,
       });
 
       console.log("API Response:", response); // 添加日志
@@ -452,7 +448,9 @@
       </div>
 
       <div class="flex justify-center w-full mt-4">
-        <Button type="submit">Query</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Query"}
+        </Button>
       </div>
     </form>
   </Card>

@@ -49,7 +49,6 @@ export interface paths {
                                 txns_yoy?: string | null;
                                 txns_qoq?: string | null;
                                 token: string;
-                                chain: string;
                             }[];
                             total: number;
                         };
@@ -84,8 +83,8 @@ export interface paths {
                 content: {
                     "application/json": {
                         date: string;
-                        chain: string;
-                        asset_type: string;
+                        chain?: string;
+                        asset_type?: string;
                         return_type?: string | null;
                         token?: string | null;
                         page: number;

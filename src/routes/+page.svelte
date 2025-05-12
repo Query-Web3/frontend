@@ -21,7 +21,7 @@
     "Unique Network",
   ];
 
-  let floatingTexts: any[] = $state([]);
+  let floatingTexts: ReturnType<typeof createFloatingText>[] = $state([]);
 
   function createFloatingText(text: string) {
     return {
