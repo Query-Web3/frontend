@@ -133,6 +133,12 @@
 
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
+    
+    // 如果是表单提交(点击查询按钮)，则重置分页到第一页
+    if (e) {
+      await goto(`?page=1`, { keepFocus: true });
+    }
+
     if (!selectedDate) {
       message.error("Please select a date");
       return;
