@@ -10,7 +10,6 @@
     TableHead,
     TableHeadCell,
     Label,
-    Pagination,
     type SelectOptionType,
   } from "flowbite-svelte";
   import { format } from "date-fns";
@@ -26,6 +25,7 @@
   type VolTxnsResponse = NonNullable<
     ApiPaths["/api/v1/vol-txns"]["post"]["responses"]["200"]["content"]["application/json"]["data"]
   >;
+
   type VolTxnsQuery = NonNullable<
     ApiPaths["/api/v1/vol-txns"]["post"]["requestBody"]
   >["content"]["application/json"];
@@ -36,8 +36,6 @@
   let selectedChain = $state("");
   let selectedCycle = $state("daily");
   let data = $state<VolTxnsResponse>([]);
-  let totalPages = $state(1);
-  let totalItems = $state(0);
 
   // 选项数据
   let chains = $state<SelectOptionType<string>[]>([]);
@@ -68,27 +66,27 @@
   }
 
   // 格式化数字
-  const formatNumber = (num: number | undefined | null | string): string => {
+  function formatNumber(num: number | undefined | null | string): string {
     if (num === undefined || num === null) return "-";
     const value = typeof num === "string" ? parseFloat(num) : num;
     if (isNaN(value)) return "-";
     return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
-  };
+  }
 
   // 格式化百分比
-  const formatPercent = (num: number | undefined | null | string): string => {
+  function formatPercent(num: number | undefined | null | string): string {
     if (num === undefined || num === null) return "-";
     const value = typeof num === "string" ? parseFloat(num) : num;
     if (isNaN(value)) return "-";
     return `${value.toFixed(2)}%`;
-  };
+  }
 
   // 检查是否为正数
-  const isPositive = (num: number | undefined | null | string): boolean => {
+  function isPositive(num: number | undefined | null | string): boolean {
     if (num === undefined || num === null) return false;
     const value = typeof num === "string" ? parseFloat(num) : num;
     return !isNaN(value) && value >= 0;
-  };
+  }
 
   async function handleSubmit(e?: Event) {
     e?.preventDefault();
@@ -126,8 +124,6 @@
       console.log("Assigned data:", data);
       // 更新分页信息
       currentPage = response.total || 1;
-      // totalPages = response.total_pages || 1;
-      // totalItems = response.total_items || 0;
     } catch (error) {
       console.error(error);
       message.error("Failed to fetch data");
