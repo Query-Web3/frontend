@@ -415,7 +415,7 @@
         </div>
         <div class="flex items-center gap-4">
           <Label class="w-20 whitespace-nowrap">chain</Label>
-          <Select class="w-full" items={chains} bind:value={selectedChain} />
+          <Select class="w-full" items={chains} bind:value={selectedChain} placeholder="" />
         </div>
       </div>
 
@@ -427,11 +427,12 @@
             class="w-full"
             items={assetTypes}
             bind:value={selectedAssetType}
+            placeholder=""
           />
         </div>
         <div class="flex items-center gap-4">
           <Label class="w-20 whitespace-nowrap">token</Label>
-          <Select class="w-full" items={tokens} bind:value={selectedToken} />
+          <Select class="w-full" items={tokens} bind:value={selectedToken} placeholder="" />
         </div>
       </div>
 
@@ -443,6 +444,7 @@
             class="w-full"
             items={returnTypes}
             bind:value={selectedReturnType}
+            placeholder=""
           />
         </div>
       </div>

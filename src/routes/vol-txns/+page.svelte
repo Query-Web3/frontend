@@ -302,12 +302,12 @@
 
       <div>
         <Label for="chain" class="mb-2">Chain</Label>
-        <Select id="chain" bind:value={selectedChain} items={chains} />
+        <Select id="chain" bind:value={selectedChain} items={chains} placeholder="" />
       </div>
 
       <div>
         <Label for="cycle" class="mb-2">Cycle</Label>
-        <Select id="cycle" bind:value={selectedCycle} items={cycles} />
+        <Select id="cycle" bind:value={selectedCycle} items={cycles} placeholder="" />
       </div>
 
       <div class="md:col-span-4 flex items-center justify-center">
