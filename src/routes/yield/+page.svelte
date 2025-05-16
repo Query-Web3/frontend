@@ -244,7 +244,7 @@
       ],
       body: data.map((row) => [
         row.token || "-",
-        `${(Number(row.apy ?? "0") * 100).toFixed(2)}%`,
+        `${(Number(row.apy ?? "0")).toFixed(2)}%`,
         formatNumber(row.tvl_usd),
         formatNumber(row.price_usd),
         row.chain || "-",
@@ -338,7 +338,7 @@
       headers,
       ...data.map((row) => [
         row.token || "-",
-        `${((Number(row.apy) || 0) * 100).toFixed(2)}%`,
+        `${((Number(row.apy) || 0)).toFixed(2)}%`,
         formatNumber(row.tvl_usd),
         formatNumber(row.price_usd),
         row.chain || "-",
@@ -474,7 +474,7 @@
               <TableBodyRow>
                 <TableBodyCell>{row.token}</TableBodyCell>
                 <TableBodyCell
-                  >{(Number(row.apy) * 100).toFixed(2)}%</TableBodyCell
+                  >{(Number(row.apy)).toFixed(2)}%</TableBodyCell
                 >
                 <TableBodyCell
                   >{row.tvl_usd?.toLocaleString() || "0"}</TableBodyCell
