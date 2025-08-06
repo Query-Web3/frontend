@@ -7,4 +7,7 @@ export default defineConfig({
     proxy: {
     },
   },
+  optimizeDeps: {
+    include: ["flowbite-svelte"]
+  }
 });

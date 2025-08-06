@@ -9,25 +9,25 @@ importers:
   .:
     dependencies:
       '@tabler/icons-svelte':
-        specifier: ^2.40.0
+        specifier: ^2.47.0
         version: 2.47.0(svelte@5.37.3)
       axios:
-        specifier: ^1.6.2
+        specifier: ^1.11.0
         version: 1.11.0
       chart.js:
-        specifier: ^4.4.0
+        specifier: ^4.5.0
         version: 4.5.0
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
       flowbite:
-        specifier: ^2.2.0
+        specifier: ^2.5.2
         version: 2.5.2(rollup@4.46.2)
       flowbite-svelte:
-        specifier: ^0.44.19
-        version: 0.44.24(rollup@4.46.2)(svelte@5.37.3)
+        specifier: ^0.45.0
+        version: 0.45.1(rollup@4.46.2)(svelte@5.37.3)
       http-api:
-        specifier: https://github.com/iyangdianfeng/http-api.git
+        specifier: github:iyangdianfeng/http-api
         version: https://codeload.github.com/iyangdianfeng/http-api/tar.gz/007e77a42ff9b9995a1044493691cce8878c39b4
       jspdf:
         specifier: ^2.5.2
@@ -36,7 +36,7 @@ importers:
         specifier: ^3.8.4
         version: 3.8.4(jspdf@2.5.2)
       openapi-fetch:
-        specifier: ^0.13.7
+        specifier: ^0.13.8
         version: 0.13.8
       xlsx:
         specifier: ^0.18.5
@@ -46,37 +46,37 @@ importers:
         version: 3.24.1
     devDependencies:
       '@sveltejs/adapter-auto':
-        specifier: ^3.0.0
+        specifier: ^3.3.1
         version: 3.3.1(@sveltejs/kit@2.27.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.37.3)(vite@5.4.19))(svelte@5.37.3)(vite@5.4.19))
       '@sveltejs/adapter-static':
         specifier: ^3.0.8
         version: 3.0.8(@sveltejs/kit@2.27.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.37.3)(vite@5.4.19))(svelte@5.37.3)(vite@5.4.19))
       '@sveltejs/kit':
-        specifier: ^2.0.0
+        specifier: ^2.27.1
         version: 2.27.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.37.3)(vite@5.4.19))(svelte@5.37.3)(vite@5.4.19)
       '@sveltejs/vite-plugin-svelte':
-        specifier: ^4.0.0-next.6
+        specifier: ^4.0.4
         version: 4.0.4(svelte@5.37.3)(vite@5.4.19)
       autoprefixer:
-        specifier: ^10.4.14
+        specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.6)
       openapi-typescript:
-        specifier: ^7.7.1
+        specifier: ^7.8.0
         version: 7.8.0(typescript@5.9.2)
       postcss:
-        specifier: ^8.4.24
+        specifier: ^8.5.6
         version: 8.5.6
       svelte:
-        specifier: ^5.0.0
+        specifier: ^5.37.3
         version: 5.37.3
       svelte-check:
-        specifier: ^3.6.0
+        specifier: ^3.8.6
         version: 3.8.6(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@5.37.3)
       tailwindcss:
-        specifier: ^3.3.2
+        specifier: ^3.4.17
         version: 3.4.17
       typescript:
-        specifier: ^5.0.0
+        specifier: ^5.9.2
         version: 5.9.2
       vite:
         specifier: ^5.0.0
@@ -803,8 +803,8 @@ packages:
   flowbite-datepicker@1.3.2:
     resolution: {integrity: sha512-6Nfm0MCVX3mpaR7YSCjmEO2GO8CDt6CX8ZpQnGdeu03WUCWtEPQ/uy0PUiNtIJjJZWnX0Cm3H55MOhbD1g+E/g==}
 
-  flowbite-svelte@0.44.24:
-    resolution: {integrity: sha512-kXhJZHGpBVq5RFOoYnzRCEM8eFa81DVp4KjUbBsLJptKhizbSSBJuYApWIQb9pBCS8EBhX4PAX+RsgEDZfEqtA==}
+  flowbite-svelte@0.45.1:
+    resolution: {integrity: sha512-KMimns3ir0ONFUzQqSEtgG1bOdJK1sOCYPN+PpOxR75w456t6k2HYAcbn+fD/nVKbznq0oabD0vr1Errdefacg==}
     engines: {node: '>=18.0.0', pnpm: '>=8.0.0'}
     peerDependencies:
       svelte: ^4.0.0
@@ -2154,7 +2154,7 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
-  flowbite-svelte@0.44.24(rollup@4.46.2)(svelte@5.37.3):
+  flowbite-svelte@0.45.1(rollup@4.46.2)(svelte@5.37.3):
     dependencies:
       '@floating-ui/dom': 1.7.3
       apexcharts: 3.54.1
