@@ -23,8 +23,8 @@ QueryWeb3 是一个现代化的区块链数据查询和可视化平台，支持�
 
 ## 环境要求
 
-- Node.js (v18 或更高版本)
-- Yarn 包管理器
+- Node.js (v22 或更高版本)
+- Pnpm 包管理器
 - 后端服务 (参见 queryweb3-backend)
 
 ## 安装步骤
@@ -37,7 +37,7 @@ cd queryweb3-frontend
 
 2. 安装依赖：
 ```bash
-yarn install
+pnpm install
 ```
 
 3. 创建环境配置文件 `.env`：
@@ -49,7 +49,7 @@ VITE_API_BASE_URL=http://localhost:8000/api/v1
 
 启动开发服务器：
 ```bash
-yarn dev
+pnpm dev
 ```
 
 应用将在 `http://localhost:5173` 运行
@@ -58,12 +58,12 @@ yarn dev
 
 构建应用：
 ```bash
-yarn build
+pnpm build
 ```
 
 预览生产构建：
 ```bash
-yarn preview
+pnpm preview
 ```
 
 ## 项目结构
