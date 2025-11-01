@@ -1,0 +1,150 @@
+@forward './base.scss';
+
+.space {
+    flex: 1;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    width: calc(100% - 80px);
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+@media (max-width: 786px) {
+    .container {
+        width: calc(100% - 40px);
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .section {
+        padding: 40px 0;
+    }
+}
+
+.section {
+    position: relative;
+    // overflow: hidden;
+    padding: 60px 0;
+}
+
+.section--first {
+    padding-top: 0;
+}
+
+.section--bt {
+    border-top: 2px solid rgba(115, 115, 115, 0.12);
+}
+
+.btns {
+    margin-top: 40px;
+    position: relative;
+    z-index: 3;
+    width: auto;
+    max-width: 400px;
+    min-width: 326px;
+}
+
+.btn {
+    position: relative;
+    height: 60px;
+    line-height: 56px;
+    text-align: center;
+    display: inline-block;
+    overflow: hidden;
+    background-color: transparent;
+    // border-radius: 15px;
+    border: 2Px solid #50fa82;
+    margin-right: 20px;
+    color: #fff;
+    font-weight: bold;
+    width: calc(50% - 20px);
+    font-size: 17px;
+}
+
+.btns a:last-child {
+    margin-right: 0;
+}
+
+.btn__primary {
+    background-color: #50fa82;
+    color: #000;
+}
+
+.input .n-input {
+    background-color: transparent;
+    border: none;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+
+.top__title {
+    font-size: 28px;
+    line-height: 30px;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 3;
+    word-break: break-word;
+}
+
+.top__text {
+    font-size: 18px;
+    line-height: 20px;
+    // color: $secondary-text;
+    color: $secondary-text;
+    font-weight: 400;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 3;
+}
+
+@media (min-width: 1000px) {
+    .top__title {
+        font-size: 3.7vw;
+        line-height: 3.8vw;
+    }
+
+    .top__text {
+        font-size: 20px;
+        line-height: 26px;
+    }
+}
+
+@media (min-width: 400px) and (max-width: 780px) {
+    .top__title {
+        font-size: 40px;
+        line-height: 41px;
+    }
+
+    .top__text {
+        font-size: 20px;
+        line-height: 26px;
+    }
+}
+
+@media (min-width: 780px) and (max-width: 1024px) {
+    .top__title {
+        font-size: 30px;
+        line-height: 36px;
+    }
+
+    .top__text {
+        font-size: 16px;
+        line-height: 20px;
+    }
+}
+
+@tailwind base;
+@tailwind utilities;
