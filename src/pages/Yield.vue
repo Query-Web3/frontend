@@ -12,7 +12,15 @@
                     </div>
                 </div>
 
-                <form class="query-box flex-1 px-4">
+                <form class="query-box flex-1 px-2">
+                    <div
+                        class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
+                        <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
+                            Token</div>
+                        <input id="token" type="text" placeholder="all token"
+                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500" />
+                    </div>
+
                     <div
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
@@ -25,32 +33,39 @@
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
                             Chain</div>
-                        <select id="chain" type="text"
-                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500" />
+                        <select id="chain"
+                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500">
+                            <option>all chain</option>
+                            <option>bifrost</option>
+                            <option>hydration </option>
+                            <option>stella</option>
+                        </select>
                     </div>
 
                     <div
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
                             Asset type</div>
-                        <select id="asset-type" type="text"
-                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500" />
+                        <select id="asset-type"
+                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500">
+                            <option>all type</option>
+                            <option>native asset</option>
+                            <option>derivative asset</option>
+                            <option>RWA</option>
+                        </select>
                     </div>
 
                     <div
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
-                        <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
-                            Token</div>
-                        <select id="token" type="text"
-                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500" />
-                    </div>
-
-                    <div
-                        class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
-                        <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
+                        <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:t ext-sm/6 dark:text-gray-400">
                             Return type</div>
-                        <select id="token" type="text"
-                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500" />
+                        <select id="token"
+                            class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500">
+                            <option>all type</option>
+                            <option>staking rewards</option>
+                            <option>liquidity mining</option>
+                            <option>farms</option>
+                        </select>
                     </div>
                 </form>
                 <button type="submit" class="query">Query</button>
@@ -61,7 +76,7 @@
             <div class="flex staking-box bg-transparent items-center">
                 <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-start">Token</div>
                 <div class="staking min-w-[70px] flex-1  flex flex justify-center items-center">
-                    Apy
+                    Yield(yearly)
                 </div>
                 <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-center">
                     Tvl($)
@@ -93,31 +108,31 @@
                 <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-start">{{ token.token_symbol }}
                 </div>
                 <div class="staking min-w-[70px] flex-1  flex flex justify-center items-center">
-                    Apy
+                    10%
                 </div>
                 <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-center">
-                    {{ token.tvl }}
+                    {{ numberFormat(token.tvl, 2) }}
                 </div>
                 <div class="mstaking min-w-[70px] flex-1 flex flex-col justify-center items-center text-center">
-                    {{ token.price }}
+                    {{ numberFormat(token.price) }}
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
                     {{ token.chain }}
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
-                    Teturn type
+                    -
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
-                    {{ token.vols_24||"-" }}
+                    {{ token.vols_24 || "-" }}
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
-                    {{ token.vols_24||"-" }}
+                    {{ token.vols_24 || "-" }}
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
-                    {{ token.asset_type }}
+                    <!-- {{ token.asset_type }} --> defi
                 </div>
                 <div class="min-w-[70px]  flex-1 flex justify-end items-center">
-                    {{ token.created_at }}
+                    {{ dayjs(token.created_at).format('YYYY/MM/DD HH:mm') }}
                 </div>
             </div>
         </div>
@@ -127,13 +142,12 @@
 </template>
 
 <script setup lang="ts">
-import { getNumstrfromChain, showWTE, showToken } from '@/utils/chain';
-import { BN } from '@polkadot/util';
 import { onMounted, onUnmounted, ref } from 'vue';
+import dayjs from 'dayjs'
 
 import loadingBox from "@/components/loading-box.vue";
-import { getHttpApi } from '@/plugins/chain';
 import { Yields } from '@/apis/detail';
+import { numberFormat } from '@/utils/format';
 const loader = ref(0)
 const tokens = ref<Array<any>>([])
 
@@ -171,8 +185,8 @@ const initData = async () => {
 }
 
 .staking-box {
-    padding: 15px 20px;
-    margin-bottom: 20px;
+    padding: 15px 15px;
+    margin-bottom: 10px;
     background-color: rgba(33, 33, 33, 0.42);
     font-size: 16px;
     min-width: 800px;
@@ -241,7 +255,7 @@ const initData = async () => {
 
     .query-item {
         display: inline-flex;
-        min-width: 200px;
+        width: 220px;
         margin-right: 10px;
         margin-bottom: 5px;
 
@@ -252,7 +266,7 @@ const initData = async () => {
 }
 
 .query {
-    padding: 10px 15px;
+    padding: 6px 15px;
     background: $primary-text;
 }
 </style>

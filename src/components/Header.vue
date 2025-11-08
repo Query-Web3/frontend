@@ -1,9 +1,9 @@
 <template>
-  <header :class="props.shadow ? 'header' : 'header header-shadow'">
+  <header class="header" :style="{ background: 'rgba(8, 8, 30, ' + (bg / 100 - 0.2) + ')' }">
     <div class="header__content container">
       <!-- btn -->
-      <button v-if="group == 'main'" :class="'header__btn  block md:hidden ' + (isActivce ? 'header__btn--active' : '')" type="button"
-        @click="toggleMenu()">
+      <button v-if="group == 'main'" :class="'header__btn  block md:hidden ' + (isActivce ? 'header__btn--active' : '')"
+        type="button" @click="toggleMenu()">
         <span></span>
         <span></span>
         <span></span>
@@ -13,7 +13,7 @@
       <!-- logo -->
       <div v-if="group == 'main'" class="header__logo" @click="home()">
         <!-- <img src="/imgs/TTE.svg" /> -->
-         Web3 Query
+        Web3 Query
       </div>
       <!-- end logo -->
 
@@ -29,7 +29,7 @@
 
       <!-- navigation -->
       <ul v-if="group == 'main'" :class="'header__nav ' + (isActivce ? 'header__nav--active' : '')">
-        <li :class="path == '/chat' ? 'active' : ''">
+        <li :class="path == '/chat' || path == '' || path == '/' ? 'active' : ''">
           <RouterLink to="/">AI Chat
             <!-- <i class="iconfont">&#xe68f;</i> -->
           </RouterLink>
@@ -63,20 +63,17 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useNotification } from 'naive-ui'
-import { ss58toHex } from "@/utils/chain";
 import { useGlobalStore } from '@/stores/global';
 import useGlobelProperties from '@/plugins/globel';
-import Identicon from "./identicon.vue";
 import router from '@/router';
 
-const props = defineProps(["shadow"])
 const userStore = useGlobalStore()
 const notification = useNotification()
+const bg = ref(0)
 
 const group = ref("main")
-const showSub = ref(true)
 
 const getPath = (paths: any) => {
   group.value = "main"
@@ -94,18 +91,14 @@ const userInfo = ref(userStore.userInfo)
 const isActivce = ref(false)
 const global = useGlobelProperties()
 
-if (!props.shadow) {
-  window.$app = global;
-  window.$notification = notification;
-  global.$notification = notification;
-}
+
+window.$app = global;
+window.$notification = notification;
+global.$notification = notification;
+
 
 const toggleMenu = () => {
   isActivce.value = !isActivce.value
-}
-
-const login = () => {
-  global.$Login()
 }
 
 userStore.$subscribe((mutation, state) => {
@@ -118,11 +111,22 @@ const home = () => {
   router.push("/")
 }
 
-const unfocus = () => {
-  showSub.value = false
-  setTimeout(() => {
-    showSub.value = true
-  }, 200)
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll);
+})
+
+const handleScroll = () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+  console.log("scrollTop", scrollTop);
+  if (scrollTop > 40) {
+    bg.value = 100
+  } else {
+    bg.value = 0
+  }
 }
 </script>
 
@@ -133,48 +137,10 @@ const unfocus = () => {
   top: 0;
   left: 0;
   z-index: 9;
-  border-bottom: 1px solid rgba(236, 236, 236, 0.08);
-  background-color: transparent;
-  transition: background - color 0.5s ease;
-  background-image: radial - gradient(transparent 1px, $primary-bg 1px);
-  background-size: 4px 4px;
-  backdrop-filter: saturate(50%) blur(4px);
+  background: rgba(0, 0, 0, 1);
+  border-bottom: 1px solid #060e3a;
 }
 
-.header-shadow {
-  z-index: 8;
-  backdrop-filter: none;
-  left: -3px;
-  top: 1.5px;
-  border: none;
-  background: transparent;
-
-  :deep(.header__logo) {
-    img{
-      filter: grayscale(100%);
-      transform: scale(1.2);
-      position: relative;
-      top: -2px;
-      left: 3px;
-    }
-  }
-
-  :deep(.active) {
-    &:after {
-      display: none;
-    }
-  }
-
-  .header__nav a {
-    color: #fff !important;
-  }
-
-  .active {
-    &:after {
-      display: none;
-    }
-  }
-}
 
 .header__content {
   display: flex;
@@ -182,17 +148,18 @@ const unfocus = () => {
   justify-content: space-between;
   align-items: center;
   position: relative;
-  height: 80px;
+  height: 72px;
 
   .header__logo {
     width: auto;
     height: 34px;
+    line-height: 32px;
     align-items: center;
-    margin-left: 4px;
+    margin-left: 0px;
     margin-right: 10px;
     cursor: pointer;
     font-size: 28px;
-    font-weight: 800;
+    font-weight: bold;
     font-family: "letter-font";
   }
 
@@ -310,20 +277,20 @@ const unfocus = () => {
 
   .header__nav>li {
     display: block;
-    margin-left: 2vw;
+    margin-left: 1vw;
     margin-bottom: 0;
     position: relative;
-    padding: 10px 0;
+    padding: 10px 10px;
 
     &.active {
       &:after {
         content: ' ';
-        width: 130%;
+        width: 100%;
         height: 70%;
         background-color: rgba($secondary-text-rgb, 0.1);
         position: absolute;
         bottom: 16%;
-        left: -15%;
+        left: 0;
       }
     }
 
@@ -357,18 +324,18 @@ const unfocus = () => {
           text-align: left;
         }
 
-        .icon{
+        .icon {
           height: 35px;
           width: 35px;
           margin-right: 10px;
         }
 
-        .title{
+        .title {
           font-size: 16px;
           margin-bottom: 2px;
         }
 
-        .subtitle{
+        .subtitle {
           font-size: 12px;
           color: rgba($secondary-text-rgb, 0.5);
         }
@@ -430,6 +397,7 @@ const unfocus = () => {
 
     &.inverse {
       background-color: rgba($primary-text-rgb, 1);
+
       span {
         color: #040406;
         letter-spacing: -1px;
@@ -513,25 +481,29 @@ const unfocus = () => {
       }
     }
 
-    .connect{
+    .connect {
       display: none;
     }
 
-    .header__dropdown{
-      li{
+    .header__dropdown {
+      li {
         padding: 0 !important;
       }
-      .icon{
+
+      .icon {
         display: none;
       }
-      .title-wrap{
+
+      .title-wrap {
         width: 100%;
       }
-      .title{
+
+      .title {
         width: 100%;
         text-align: center;
       }
-      .subtitle{
+
+      .subtitle {
         display: none;
       }
     }

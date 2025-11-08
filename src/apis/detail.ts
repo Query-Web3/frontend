@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ss58toHex } from "@/utils/chain";
 
-const api = "localhost:8082"
+const api = "192.168.110.205:8082"
 
 export async function Yields(ps: any) {
   let params = `
