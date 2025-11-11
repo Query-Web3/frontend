@@ -11,14 +11,20 @@ export async function Yields(ps: any) {
         chain: 1, 
         asset:"",
         token: "",
-        return: ""
-      )
+        return: "",
+        page: ${ps.page} ,
+        size: ${ps.size}
+      ){ total, data }
     }
   `
 
   const response = await axios.post('http://' + api + '/gql', {
     query: params
   })
-  const data = response.data.data.yields
-  return JSON.parse(data)
+  const data = response.data.data.yields.data
+  let list = JSON.parse(data)
+  for (let i = 0; i < list.length; i++) {
+    list[i].symbol = JSON.parse(list[i].symbol)
+  }
+  return { list: list, total: response.data.data.yields.total, page: ps.page, size: ps.size }
 }

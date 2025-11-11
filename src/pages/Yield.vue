@@ -105,10 +105,12 @@
             </div>
             <loadingBox class="loader-wrapper" text="Loading..." v-if="loader == 0" />
             <div class="flex staking-box items-center" v-for="(token, _) in tokens">
-                <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-start">{{ token.token_symbol }}
+                <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-start">{{
+                    token.symbol.symbol
+                }}
                 </div>
                 <div class="staking min-w-[70px] flex-1  flex flex justify-center items-center">
-                    10%
+                    {{ tvl(token) }}
                 </div>
                 <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-center">
                     {{ numberFormat(token.tvl, 2) }}
@@ -135,8 +137,10 @@
                     {{ dayjs(token.created_at).format('YYYY/MM/DD HH:mm') }}
                 </div>
             </div>
-        </div>
 
+            <Pagination :size="size" :page="page" :total="total" @page-change="goto" />
+        </div>
+        
         <div class="bottom"></div>
     </div>
 </template>
@@ -146,11 +150,15 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import dayjs from 'dayjs'
 
 import loadingBox from "@/components/loading-box.vue";
+import Pagination from '@/components/Pagination.vue';
 import { Yields } from '@/apis/detail';
 import { numberFormat } from '@/utils/format';
+
 const loader = ref(0)
 const tokens = ref<Array<any>>([])
-
+const size = ref(10)
+const page = ref(1)
+const total = ref(0)
 
 onMounted(async () => {
     await initData();
@@ -162,10 +170,31 @@ onUnmounted(async () => {
 
 const initData = async () => {
     // 获取资产信息 
-    const tokensFormApi = await Yields({});
+    const tokensFormApi = await Yields({ page: page.value, size: size.value });
     console.log("tokensFormApi:", tokensFormApi);
-    tokens.value = tokensFormApi;
+    tokens.value = tokensFormApi.list;
     loader.value = 1;
+    total.value = tokensFormApi.total;
+    page.value = tokensFormApi.page;
+    size.value = tokensFormApi.size;
+}
+
+const goto = async (p: number) => {
+    page.value = p;
+    loader.value = 0;
+    await initData();
+}
+
+const tvl = (token: any) => {
+    if (token.apy) {
+        return `${numberFormat(token.apy, 2)}%`
+    } else if (token.farm_apy) {
+        return `${numberFormat(token.farm_apy, 2)}%`
+    } else if (token.pool_apy) {
+        return `${numberFormat(token.pool_apy, 2)}%`
+    } else {
+        return '-'
+    }
 }
 </script>
 
@@ -185,8 +214,8 @@ const initData = async () => {
 }
 
 .staking-box {
-    padding: 15px 15px;
-    margin-bottom: 10px;
+    padding: 13px 15px;
+    margin-bottom: 5px;
     background-color: rgba(33, 33, 33, 0.42);
     font-size: 16px;
     min-width: 800px;
@@ -234,7 +263,6 @@ const initData = async () => {
             color: rgba($secondary-text-rgb, 0.6);
         }
     }
-
 }
 
 .bottom {
