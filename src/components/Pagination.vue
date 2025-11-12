@@ -11,11 +11,11 @@
                 <p class="text-sm text-gray-300">
                     Showing
                     {{ ' ' }}
-                    <span class="font-medium">1</span>
+                    <span class="font-medium">{{ (props.page - 1) * size + 1 }}</span>
                     {{ ' ' }}
                     to
                     {{ ' ' }}
-                    <span class="font-medium">10</span>
+                    <span class="font-medium">{{ props.page * size > props.total ? props.total : props.page * size }}</span>
                     {{ ' ' }}
                     of
                     {{ ' ' }}
@@ -43,10 +43,10 @@
 
 
                 <!-- 当前页前3页 -->
-                <div @click="handlePageChange(cpage)" v-for="cpage in prevPages" 
+                <div @click="handlePageChange(cpage)" v-for="cpage in prevPages"
                     class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-200 inset-ring inset-ring-gray-700 hover:bg-white/5 focus:z-20 focus:outline-offset-0">
                     {{ cpage }}</div>
-                    
+
                 <!-- 当前页 -->
                 <div @click="handlePageChange(page)"
                     class="active relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-200 inset-ring inset-ring-gray-700 hover:bg-white/5 focus:z-20 focus:outline-offset-0 md:inline-flex">
@@ -62,7 +62,7 @@
                     class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-400 inset-ring inset-ring-gray-700 focus:outline-offset-0">...</span>
 
                 <!-- 末页（仅在当前页后有足够页码时显示） -->
-                <div v-if="showLastPage" @click="handlePageChange(totalPages)" 
+                <div v-if="showLastPage" @click="handlePageChange(totalPages)"
                     class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-200 inset-ring inset-ring-gray-700 hover:bg-white/5 focus:z-20 focus:outline-offset-0">
                     {{ totalPages }}</div>
 

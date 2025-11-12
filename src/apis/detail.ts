@@ -7,11 +7,11 @@ export async function Yields(ps: any) {
   let params = `
     query{
       yields(
-        date: 0,
-        chain: 1, 
-        asset:"",
-        token: "",
-        return: "",
+        date: "${ps.date}",
+        chain: "${ps.chain}", 
+        asset: "${ps.asset}",
+        token: "${ps.token}",
+        return: "${ps.return}",
         page: ${ps.page} ,
         size: ${ps.size}
       ){ total, data }

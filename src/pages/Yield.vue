@@ -17,7 +17,7 @@
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
                             Token</div>
-                        <input id="token" type="text" placeholder="all token"
+                        <input v-model="token" type="text" placeholder="all token"
                             class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500" />
                     </div>
 
@@ -25,7 +25,7 @@
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
                             &nbsp;Date&nbsp;&nbsp;&nbsp;</div>
-                        <input id="date" type="date"
+                        <input v-model="date" type="date"
                             class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500" />
                     </div>
 
@@ -33,12 +33,12 @@
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
                             Chain</div>
-                        <select id="chain"
+                        <select v-model="chain"
                             class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500">
-                            <option>all chain</option>
-                            <option>bifrost</option>
-                            <option>hydration </option>
-                            <option>stella</option>
+                            <option value="">all chain</option>
+                            <option value="bifrost">bifrost</option>
+                            <option value="hydration">hydration </option>
+                            <option value="stella">stella</option>
                         </select>
                     </div>
 
@@ -46,12 +46,12 @@
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">
                             Asset type</div>
-                        <select id="asset-type"
+                        <select v-model="asset"
                             class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500">
-                            <option>all type</option>
-                            <option>native asset</option>
-                            <option>derivative asset</option>
-                            <option>RWA</option>
+                            <option value="">all type</option>
+                            <option value="native asset">native asset</option>
+                            <option value="derivative asset">derivative asset</option>
+                            <option value="RWA">RWA</option>
                         </select>
                     </div>
 
@@ -59,16 +59,16 @@
                         class="query-item flex items-center bg-white pl-2 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-indigo-600 dark:bg-white/5 dark:outline-gray-600 dark:has-[input:focus-within]:outline-indigo-500">
                         <div class="pr-2 shrink-0 text-base text-gray-500 select-none sm:t ext-sm/6 dark:text-gray-400">
                             Return type</div>
-                        <select id="token"
+                        <select v-model="returnType"
                             class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500">
-                            <option>all type</option>
-                            <option>staking rewards</option>
-                            <option>liquidity mining</option>
-                            <option>farms</option>
+                            <option value="">all type</option>
+                            <option value="staking rewards">staking rewards</option>
+                            <option value="liquidity mining">liquidity mining</option>
+                            <option value="farms">farms</option>
                         </select>
                     </div>
                 </form>
-                <button type="submit" class="query">Query</button>
+                <button type="submit" @click="initData" class="query">Query</button>
             </div>
         </div>
 
@@ -122,7 +122,7 @@
                     {{ token.chain }}
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
-                    -
+                    {{ token.return_type }}
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
                     {{ token.vols_24 || "-" }}
@@ -131,13 +131,12 @@
                     {{ token.vols_24 || "-" }}
                 </div>
                 <div class="daily min-w-[70px] flex-1 flex flex-col justify-center items-center">
-                    <!-- {{ token.asset_type }} --> defi
+                    {{ token.type }} 
                 </div>
                 <div class="min-w-[70px]  flex-1 flex justify-end items-center">
                     {{ dayjs(token.created_at).format('YYYY/MM/DD HH:mm') }}
                 </div>
             </div>
-
             <Pagination :size="size" :page="page" :total="total" @page-change="goto" />
         </div>
         
@@ -159,6 +158,11 @@ const tokens = ref<Array<any>>([])
 const size = ref(10)
 const page = ref(1)
 const total = ref(0)
+const date = ref("")
+const chain = ref("")
+const asset = ref("")
+const token = ref("")
+const returnType = ref("")  
 
 onMounted(async () => {
     await initData();
@@ -169,8 +173,21 @@ onUnmounted(async () => {
 })
 
 const initData = async () => {
+    // console.log("date:", date.value);
+    // console.log("chain:", chain.value);
+    // console.log("asset:", asset.value);
+    // console.log("token:", token.value);
+    // console.log("returnType:", returnType.value);
     // 获取资产信息 
-    const tokensFormApi = await Yields({ page: page.value, size: size.value });
+    const tokensFormApi = await Yields({ 
+        page: page.value, 
+        size: size.value,
+        date: date.value,
+        chain: chain.value,
+        asset: asset.value,
+        token: token.value,
+        return: returnType.value
+    });
     console.log("tokensFormApi:", tokensFormApi);
     tokens.value = tokensFormApi.list;
     loader.value = 1;
