@@ -22,6 +22,6 @@ fi
 npm run build
 
 # 编译
-docker build . -t "wetee/dapp:$TAG"
+docker build . -t "wetee/query_web3_ui:$TAG"
 # 推送镜像
-docker push "wetee/dapp:$TAG"
+docker push "wetee/query_web3_ui:$TAG"
