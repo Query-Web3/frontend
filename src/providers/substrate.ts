@@ -9,11 +9,11 @@ import { type Wallet, getWallets } from "@talismn/connect-wallets";
 export class SubstrateProvider {
   // 区块链链接
   client: ApiPromise | undefined;
-  unsubscribe: any;
+  unsubscribe: unknown;
 
   // 提交交易
   signAndSend = async (tx: SubmittableExtrinsic<'promise'>, signer: string, onSeccess: onCallFn, onError: onCallFn): Promise<void> => {
-    let keypair = JSON.parse(window.localStorage.getItem("keypair") || "{}")
+    const keypair = JSON.parse(window.localStorage.getItem("keypair") || "{}")
     let ps = [];
     if (keypair[signer]) {
       const pair = keyring.addFromUri(keypair[signer], { name: 'x' }, 'sr25519');
@@ -48,7 +48,7 @@ export class SubstrateProvider {
     return new Promise(async (resolve, reject) => {
       try {
         // @ts-ignore
-        const unsub = await tx.signAndSend(...ps, ({ events = [], status,dispatchError }: any) => {
+        const unsub = await tx.signAndSend(...ps, ({ status,dispatchError }: unknown) => {
           if (dispatchError) {
             let error = "";
             if (dispatchError.isModule) {
@@ -87,7 +87,7 @@ export class SubstrateProvider {
             resolve(status);
           }
         });
-      } catch (e: any) {
+      } catch (e: unknown) {
         loading.close();
         window.$notification["error"]({
           content: 'Error',

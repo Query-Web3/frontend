@@ -74,12 +74,12 @@ function createFloatingText(text: string) {
   };
 }
 
-const animateTimeout = ref<any>(null);
+const animateTimeout = ref<NodeJS.Timeout | null>(null);
 const floatingTexts = ref(texts.map((text) => createFloatingText(text)));
 const animate = () => {
   floatingTexts.value = floatingTexts.value.map((item) => {
-    let newX = item.x + item.speed.x;
-    let newY = item.y + item.speed.y;
+    const newX = item.x + item.speed.x;
+    const newY = item.y + item.speed.y;
 
     // Bounce off edges
     if (newX <= 0 || newX >= 100)
@@ -101,7 +101,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  clearTimeout(animateTimeout.value);
+  if (animateTimeout.value) {
+    clearTimeout(animateTimeout.value);
+  }
 });
 </script>
 

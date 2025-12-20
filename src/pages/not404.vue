@@ -8,7 +8,7 @@
 import { defineComponent, onMounted, reactive, toRefs } from 'vue';
 
 export default defineComponent({
-  name: 'not404',
+  name: "404Page",
   components: {},
   setup() {
     const data = reactive({
