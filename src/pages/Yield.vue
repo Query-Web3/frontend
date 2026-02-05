@@ -106,7 +106,7 @@
             <loadingBox class="loader-wrapper" text="Loading..." v-if="loader == 0" />
             <div class="flex staking-box items-center" v-for="(token, _) in tokens">
                 <div class="title min-w-[70px] flex-1 flex flex-col justify-center items-start">{{
-                    token.symbol.symbol
+                    token.symbol.symbol||token.symbol.token0_symbol
                 }}
                 </div>
                 <div class="staking min-w-[70px] flex-1  flex flex justify-center items-center">
